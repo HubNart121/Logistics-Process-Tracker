@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logistic Tracker - นำเข้าสินค้า Yiwu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- html2pdf Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --primary-blue: #2563eb;
+            --dark-slate: #1e293b;
+        }
+
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Connector Line styling */
+        .connector-line::before {
+            content: '';
+            position: absolute;
+            left: 1.75rem;
+            top: 4rem;
+            bottom: -1.5rem;
+            width: 2px;
+            background-color: #e2e8f0;
+            z-index: 0;
+        }
+        @media (min-width: 768px) {
+            .connector-line::before {
+                left: 2rem;
+                bottom: -2rem;
+            }
+        }
+        .process-card:last-child .connector-line::before {
+            display: none;
+        }
+
+        /* Logic for PDF Mirror Spans */
+        .pdf-mirror { display: none; }
+        
+        /* PDF/Print Specific Styles */
+        .pdf-header { display: none; }
+        
+        .is-generating-pdf .pdf-mirror { 
+            display: inline-block !important; 
+            width: auto !important;
+        }
+        .is-generating-pdf input, .is-generating-pdf select, .is-generating-pdf textarea {
+            display: none !important;
+        }
+
+        .is-generating-pdf .no-print {
+            display: none !important;
+        }
+
+        .is-generating-pdf .pdf-header {
+            display: block !important;
+            border-bottom: 2px solid var(--primary-blue);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .is-generating-pdf .process-card {
+            page-break-inside: avoid;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen p-3 sm:p-6 md:p-8 text-slate-800">
+
+    <div id="main-content" class="max-w-4xl mx-auto bg-white sm:bg-transparent rounded-3xl overflow-hidden p-1">
+        
+        <!-- PDF Only Header (Hidden on Web) -->
+        <div class="pdf-header p-6">
+            <div class="flex justify-between items-end">
+                <div>
+                    <h1 class="text-3xl font-bold text-blue-700">Logistic Tracking Report</h1>
+                    <p class="text-slate-500">รายงานสรุปขั้นตอนการขนส่งสินค้า</p>
+                </div>
+                <div class="text-right text-sm text-slate-400">
+                    <p>วันที่ออกรายงาน: <span id="reportDate"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Section -->
+        <header class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 mb-6 md:mb-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
+                <div class="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                    <div class="bg-blue-600 p-2.5 sm:p-3 rounded-xl shadow-lg shadow-blue-200 text-white shrink-0">
+                        <i data-lucide="truck" class="w-5 h-5 sm:w-7 sm:h-7"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="relative w-full">
+                            <input type="text" id="projectName" value="นำเข้าสินค้าจาก Yiwu มา ไทย" 
+                                   oninput="syncMirror('projectName')"
+                                   class="text-xl sm:text-2xl font-bold bg-transparent border-b border-slate-100 hover:border-slate-300 focus:border-blue-500 focus:outline-none transition-all w-full">
+                            <span id="projectName-mirror" class="pdf-mirror text-xl sm:text-2xl font-bold text-slate-800">นำเข้าสินค้าจาก Yiwu มา ไทย</span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 sm:gap-3 mt-1">
+                            <p class="text-slate-500 text-xs sm:text-sm whitespace-nowrap">Logistic Planning Tool</p>
+                            <button onclick="downloadPDF()" class="no-print flex items-center gap-1 text-[10px] sm:text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-2.5 py-1.5 rounded-lg transition-colors border border-blue-100">
+                                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                                ดาวน์โหลดรายงาน PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-blue-50 px-4 py-2 sm:px-6 sm:py-3 rounded-2xl border border-blue-100 text-center shrink-0 w-full md:w-auto">
+                    <p class="text-blue-600 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-0.5">ระยะเวลารวมทั้งหมด</p>
+                    <p class="text-2xl sm:text-3xl font-black text-blue-700"><span id="totalDurationDisplay">0</span> <span class="text-base sm:text-lg font-medium">วัน</span></p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Process Container -->
+        <div id="processContainer" class="space-y-4 sm:space-y-6 px-1">
+            <!-- Rows injected by JavaScript -->
+        </div>
+
+        <!-- Add Button -->
+        <div class="px-2 no-print">
+            <button onclick="addProcess()" 
+                    class="w-full mt-6 py-4 border-2 border-dashed border-slate-300 rounded-2xl text-slate-400 hover:text-blue-500 hover:border-blue-400 hover:bg-blue-50 transition-all flex items-center justify-center gap-2 font-medium">
+                <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                เพิ่มขั้นตอนการทำงาน
+            </button>
+        </div>
+
+        <!-- Summary Footer -->
+        <div class="mt-10 sm:mt-12 bg-slate-800 rounded-3xl p-6 sm:p-8 text-white shadow-xl">
+            <h3 class="text-lg sm:text-xl font-bold mb-6 flex items-center gap-3 border-b border-slate-700 pb-4">
+                <i data-lucide="award" class="text-blue-400 w-6 h-6"></i>
+                ระยะเวลาโครงการรวม
+            </h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 items-center">
+                <div class="space-y-2 text-center sm:text-left">
+                    <p class="text-blue-400 text-[10px] font-bold uppercase tracking-widest">จุดเริ่มงาน</p>
+                    <p id="summaryStart" class="text-xl sm:text-2xl font-bold">-</p>
+                    <p id="summaryOrigin" class="text-slate-400 text-sm italic">-</p>
+                </div>
+                
+                <div class="flex flex-col items-center justify-center">
+                    <div class="text-[10px] text-slate-500 uppercase font-bold mb-2">ระยะเวลาสุทธิ</div>
+                    <div class="flex items-center w-full">
+                        <div class="h-px bg-slate-700 flex-1"></div>
+                        <div class="bg-blue-600 px-5 py-2 rounded-full text-sm font-black mx-4 shadow-lg shadow-blue-900/50">
+                            <span id="summaryTotalDays">0</span> วัน
+                        </div>
+                        <div class="h-px bg-slate-700 flex-1"></div>
+                    </div>
+                </div>
+
+                <div class="space-y-2 text-center sm:text-right">
+                    <p class="text-blue-400 text-[10px] font-bold uppercase tracking-widest">จุดสิ้นสุด</p>
+                    <p id="summaryEnd" class="text-xl sm:text-2xl font-bold">-</p>
+                    <p id="summaryDestination" class="text-slate-400 text-sm italic">-</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-50 text-white backdrop-blur-md">
+        <div class="text-center bg-white p-10 rounded-3xl shadow-2xl border border-slate-100 text-slate-800">
+            <div class="animate-spin rounded-full h-14 w-14 border-4 border-blue-600 border-t-transparent mx-auto mb-6"></div>
+            <p class="text-xl font-bold">กำลังจัดเตรียมรายงาน PDF</p>
+            <p class="text-slate-500 text-sm mt-2">โปรดรอสักครู่ ระบบกำลังจัดเลย์เอาต์เพื่อป้องกันข้อมูลตกหล่น...</p>
+        </div>
+    </div>
+
+    <script>
+        let processes = [
+            { id: 1, name: "ส่งสินค้าไปยังโกดัง Yiwu", origin: "Supplier A", destination: "โกดัง Yiwu", start: "2026-03-08", end: "2026-03-16" },
+            { id: 2, name: "ส่งสินค้าจากโกดัง Yiwu มายังโกดังไทย", origin: "โกดัง Yiwu", destination: "โกดังไทย", start: "2026-03-18", end: "2026-03-27" }
+        ];
+
+        function calculateDays(start, end) {
+            if (!start || !end) return 0;
+            const s = new Date(start); s.setHours(0,0,0,0);
+            const e = new Date(end); e.setHours(0,0,0,0);
+            const diff = e - s;
+            const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            return days >= 0 ? days : 0;
+        }
+
+        function formatDateThai(dateStr) {
+            if (!dateStr) return "-";
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return "-";
+            return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear().toString().slice(-2)}`;
+        }
+
+        function syncMirror(id) {
+            const input = document.getElementById(id);
+            const mirror = document.getElementById(id + '-mirror');
+            if (input && mirror) {
+                mirror.innerText = input.value;
+            }
+        }
+
+        function render() {
+            const container = document.getElementById('processContainer');
+            container.innerHTML = '';
+
+            processes.forEach((p) => {
+                const duration = calculateDays(p.start, p.end);
+                const card = document.createElement('div');
+                card.className = 'process-card relative group px-2 sm:px-0';
+                card.innerHTML = `
+                    <div class="connector-line no-print"></div>
+                    <div class="relative z-10 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all p-4 sm:p-6">
+                        <div class="flex justify-between items-start mb-5">
+                            <div class="flex-1">
+                                <label class="text-[9px] uppercase font-black text-blue-500 tracking-wider mb-1 block">ชื่อขั้นตอนการทำงาน</label>
+                                <input type="text" oninput="updateProcess(${p.id}, 'name', this.value)" value="${p.name}" 
+                                       class="w-full text-lg font-bold bg-transparent focus:outline-none focus:text-blue-700 transition-colors">
+                                <span class="pdf-mirror text-lg font-bold text-slate-800">${p.name}</span>
+                            </div>
+                            <button onclick="removeProcess(${p.id})" class="no-print text-slate-300 hover:text-red-500 p-2 rounded-xl hover:bg-red-50 transition-all shrink-0">
+                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-xl">
+                                    <i data-lucide="arrow-up-right" class="text-slate-400 shrink-0" size="16"></i>
+                                    <div class="flex-1">
+                                        <label class="text-[8px] uppercase font-bold text-slate-400 block">ต้นทาง</label>
+                                        <input type="text" oninput="updateProcess(${p.id}, 'origin', this.value)" value="${p.origin}" 
+                                               class="w-full bg-transparent text-sm font-semibold focus:outline-none">
+                                        <span class="pdf-mirror text-sm font-semibold text-slate-700">${p.origin}</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 bg-blue-50/50 p-3 rounded-xl border border-blue-100/50">
+                                    <i data-lucide="arrow-down-left" class="text-blue-500 shrink-0" size="16"></i>
+                                    <div class="flex-1">
+                                        <label class="text-[8px] uppercase font-bold text-blue-400 block">ปลายทาง</label>
+                                        <input type="text" oninput="updateProcess(${p.id}, 'destination', this.value)" value="${p.destination}" 
+                                               class="w-full bg-transparent text-sm font-semibold focus:outline-none">
+                                        <span class="pdf-mirror text-sm font-semibold text-blue-700">${p.destination}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-1 gap-3">
+                                <div class="bg-slate-50 p-3 rounded-xl">
+                                    <label class="text-[8px] uppercase font-bold text-slate-400 block mb-1">วันที่เริ่ม</label>
+                                    <input type="date" onchange="updateProcess(${p.id}, 'start', this.value)" value="${p.start}" 
+                                           class="w-full bg-transparent text-xs font-semibold focus:outline-none">
+                                    <span class="pdf-mirror text-xs font-semibold text-slate-600">${formatDateThai(p.start)}</span>
+                                </div>
+                                <div class="bg-slate-50 p-3 rounded-xl">
+                                    <label class="text-[8px] uppercase font-bold text-slate-400 block mb-1">วันที่สิ้นสุด</label>
+                                    <input type="date" onchange="updateProcess(${p.id}, 'end', this.value)" value="${p.end}" 
+                                           class="w-full bg-transparent text-xs font-semibold focus:outline-none">
+                                    <span class="pdf-mirror text-xs font-semibold text-slate-600">${formatDateThai(p.end)}</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-center bg-blue-600 rounded-2xl p-4 text-center text-white shadow-inner">
+                                <div>
+                                    <p class="text-[9px] font-bold uppercase opacity-70 mb-1 tracking-widest">ระยะเวลา</p>
+                                    <p class="text-4xl font-black">${duration}<span class="ml-1 text-sm font-light">วัน</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            updateSummary();
+            lucide.createIcons();
+        }
+
+        function updateProcess(id, field, value) {
+            const index = processes.findIndex(p => p.id === id);
+            if (index !== -1) {
+                processes[index][field] = value;
+                // Update summary immediately but only re-render if it's a date to avoid input focus loss
+                if (field === 'start' || field === 'end') {
+                    render();
+                } else {
+                    updateSummary();
+                    // Just sync the mirror span for text inputs
+                    const card = document.querySelectorAll('.process-card')[index];
+                    if (card) {
+                        const mirror = card.querySelectorAll('.pdf-mirror')[field === 'name' ? 0 : (field === 'origin' ? 1 : 2)];
+                        if (mirror) mirror.innerText = value;
+                    }
+                }
+            }
+        }
+
+        function addProcess() {
+            const last = processes[processes.length - 1];
+            processes.push({
+                id: Date.now(),
+                name: "ระบุชื่อขั้นตอน...",
+                origin: last ? last.destination : "",
+                destination: "",
+                start: last ? last.end : "",
+                end: ""
+            });
+            render();
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function removeProcess(id) {
+            processes = processes.filter(p => p.id !== id);
+            render();
+        }
+
+        function updateSummary() {
+            const displayHeader = document.getElementById('totalDurationDisplay');
+            const summaryDays = document.getElementById('summaryTotalDays');
+
+            if (processes.length === 0) {
+                displayHeader.innerText = summaryDays.innerText = '0';
+                return;
+            }
+
+            const startDates = processes.map(p => new Date(p.start).getTime()).filter(t => !isNaN(t));
+            const endDates = processes.map(p => new Date(p.end).getTime()).filter(t => !isNaN(t));
+
+            if (startDates.length > 0 && endDates.length > 0) {
+                const minStart = new Date(Math.min(...startDates));
+                const maxEnd = new Date(Math.max(...endDates));
+                const totalDays = calculateDays(minStart, maxEnd);
+
+                displayHeader.innerText = summaryDays.innerText = totalDays;
+                document.getElementById('summaryStart').innerText = formatDateThai(minStart);
+                document.getElementById('summaryEnd').innerText = formatDateThai(maxEnd);
+                document.getElementById('summaryOrigin').innerText = processes[0].origin || "ไม่ระบุ";
+                document.getElementById('summaryDestination').innerText = processes[processes.length-1].destination || "ไม่ระบุ";
+            }
+        }
+
+        async function downloadPDF() {
+            const element = document.getElementById('main-content');
+            const projectName = document.getElementById('projectName').value || 'logistic-report';
+            const overlay = document.getElementById('loadingOverlay');
+            
+            // Sync the main project name mirror before starting
+            syncMirror('projectName');
+            
+            // Set current date for report
+            document.getElementById('reportDate').innerText = new Date().toLocaleDateString('th-TH');
+            
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+
+            // Apply generating class to body to trigger PDF specific styles
+            document.body.classList.add('is-generating-pdf');
+
+            const opt = {
+                margin:       10,
+                filename:     `${projectName}.pdf`,
+                image:        { type: 'jpeg', quality: 1.0 },
+                html2canvas:  { 
+                    scale: 3, 
+                    useCORS: true, 
+                    logging: false, 
+                    letterRendering: true,
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            try {
+                // Wait a tiny bit for the browser to render the hidden mirrors
+                await new Promise(resolve => setTimeout(resolve, 300));
+                await html2pdf().set(opt).from(element).save();
+            } catch (error) {
+                console.error('PDF Error:', error);
+            } finally {
+                document.body.classList.remove('is-generating-pdf');
+                overlay.classList.remove('flex');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        window.onload = render;
+    </script>
+</body>
+</html>
