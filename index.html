@@ -49,11 +49,18 @@
             -webkit-backdrop-filter: blur(12px);
         }
 
-        /* PDF Styles */
+        /* PDF Styles - ปรับปรุงเพื่อแก้ปัญหาตัวหนังสือตกหล่น */
         .is-generating-pdf .no-print { display: none !important; }
         .is-generating-pdf .pdf-only { display: block !important; }
         .is-generating-pdf input, .is-generating-pdf select { border: none !important; background: transparent !important; appearance: none !important; padding: 0 !important; }
-        .is-generating-pdf .process-card { page-break-inside: avoid; margin-bottom: 1.5rem; }
+        
+        .is-generating-pdf .process-card,
+        .is-generating-pdf #summaryCard,
+        .is-generating-pdf header { 
+            page-break-inside: avoid !important; 
+            break-inside: avoid !important;
+            margin-bottom: 2rem !important;
+        }
     </style>
 </head>
 <body class="bg-[#F8FAFC] text-slate-900 min-h-screen flex flex-col md:flex-row overflow-x-hidden">
@@ -92,7 +99,7 @@
         <div class="p-4 bg-slate-50 border-t border-slate-100">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">แอปพลิเคชันจัดการโลจิสติกส์</p>
-                <p class="text-[10px] text-slate-300 font-medium">VERSION 2.1 (Large Text Mode)</p>
+                <p class="text-[10px] text-slate-300 font-medium">VERSION 2.1 (PDF Fix)</p>
             </div>
         </div>
     </aside>
@@ -117,7 +124,7 @@
                                     <i data-lucide="printer" class="w-5 h-5"></i>
                                 </button>
                                 <button onclick="shareProject()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-400" title="แชร์ข้อความสถานะ">
-                                    <i data-lucide="share-2" class="w-5 h-5"></i>
+                                    <i data-lucide="share-2" class="w-4 h-4"></i>
                                 </button>
                             </div>
                         </div>
@@ -508,15 +515,24 @@
             const project = projects.find(p => p.id === activeProjectId);
             document.body.classList.add('is-generating-pdf');
             
+            // ปรับปรุงการตั้งค่า PDF Options เพื่อแก้ปัญหา Content ตกหล่น
             const opt = {
-                margin: 5,
+                margin: [10, 10, 10, 10], // top, left, bottom, right (mm)
                 filename: `Logistics_${project.name}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true,
+                    letterRendering: true,
+                    logging: false
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // บังคับให้ตรวจสอบ CSS page-break
             };
 
             try {
+                // รอสักครู่เพื่อให้ CSS .is-generating-pdf ทำงานเต็มที่
+                await new Promise(r => setTimeout(r, 300));
                 const element = document.getElementById('main-content');
                 await html2pdf().set(opt).from(element).save();
             } finally {
