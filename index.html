@@ -43,16 +43,13 @@
         }
         .process-card:last-child .connector-line::before { display: none; }
 
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
+        /* PDF Styles - แก้ไขปัญหาตัวหนังสือตกหล่นและ input เพี้ยน */
+        .pdf-mirror { display: none; }
 
-        /* PDF Styles - ปรับปรุงเพื่อแก้ปัญหาตัวหนังสือตกหล่น */
         .is-generating-pdf .no-print { display: none !important; }
-        .is-generating-pdf .pdf-only { display: block !important; }
-        .is-generating-pdf input, .is-generating-pdf select { border: none !important; background: transparent !important; appearance: none !important; padding: 0 !important; }
+        .is-generating-pdf input, 
+        .is-generating-pdf select { display: none !important; }
+        .is-generating-pdf .pdf-mirror { display: inline-block !important; }
         
         .is-generating-pdf .process-card,
         .is-generating-pdf #summaryCard,
@@ -60,7 +57,11 @@
             page-break-inside: avoid !important; 
             break-inside: avoid !important;
             margin-bottom: 2rem !important;
+            border: 1px solid #f1f5f9 !important; /* เพิ่มเส้นขอบจางๆ ให้ PDF ดูคมชัด */
         }
+
+        .is-generating-pdf body { background: white !important; }
+        .is-generating-pdf main { height: auto !important; overflow: visible !important; }
     </style>
 </head>
 <body class="bg-[#F8FAFC] text-slate-900 min-h-screen flex flex-col md:flex-row overflow-x-hidden">
@@ -99,7 +100,7 @@
         <div class="p-4 bg-slate-50 border-t border-slate-100">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">แอปพลิเคชันจัดการโลจิสติกส์</p>
-                <p class="text-[10px] text-slate-300 font-medium">VERSION 2.1 (PDF Fix)</p>
+                <p class="text-[10px] text-slate-300 font-medium">VERSION 2.2 (Report Optimized)</p>
             </div>
         </div>
     </aside>
@@ -133,12 +134,15 @@
                             <input type="text" id="projectName" oninput="updateProject('name', this.value)" 
                                    class="text-4xl font-black text-slate-900 bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
                                    placeholder="ชื่อโปรเจกต์...">
+                            <span id="projectName-mirror" class="pdf-mirror text-4xl font-black text-slate-900"></span>
+                            
                             <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
                                 <div class="flex items-center gap-3 text-slate-500">
                                     <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Area:</span>
                                     <input type="text" id="projectArea" oninput="updateProject('area', this.value)" 
                                            class="text-lg font-semibold bg-transparent border-none focus:outline-none w-36 p-0" 
                                            placeholder="รหัสพื้นที่...">
+                                    <span id="projectArea-mirror" class="pdf-mirror text-lg font-semibold text-slate-700"></span>
                                 </div>
                                 <div class="w-px h-5 bg-slate-200 hidden sm:block"></div>
                                 <div class="flex items-center gap-3 text-slate-500">
@@ -146,11 +150,12 @@
                                     <input type="text" id="serviceProvider" oninput="updateProject('serviceProvider', this.value)" 
                                            class="text-lg font-semibold bg-transparent border-none focus:outline-none w-56 p-0" 
                                            placeholder="ชื่อผู้ให้บริการ...">
+                                    <span id="serviceProvider-mirror" class="pdf-mirror text-lg font-semibold text-slate-700"></span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="flex flex-wrap gap-3 pt-2 no-print">
+                        <div class="flex flex-wrap gap-3 pt-2">
                             <div class="flex items-center gap-3 px-5 py-3 bg-slate-50 rounded-2xl border border-slate-100">
                                 <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Status:</span>
                                 <select id="projectStatus" onchange="updateProject('status', this.value)" 
@@ -160,6 +165,7 @@
                                     <option value="Done">Done</option>
                                     <option value="Delayed">Delayed</option>
                                 </select>
+                                <span id="projectStatus-mirror" class="pdf-mirror text-sm font-bold text-blue-600"></span>
                             </div>
                         </div>
                     </div>
@@ -311,6 +317,7 @@
                 project[field] = value;
                 save();
                 if (field === 'name') renderSidebar();
+                updateSummaryData(); // เพื่ออัปเดต Mirror ทันทีที่พิมพ์
             }
         }
 
@@ -434,6 +441,7 @@
                                         <input type="text" value="${p.name}" oninput="updateProcess(${p.id}, 'name', this.value)" 
                                                class="text-2xl font-bold bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
                                                placeholder="ชื่อขั้นตอนการทำงาน...">
+                                        <span class="pdf-mirror text-2xl font-bold text-slate-900">${p.name || '-'}</span>
                                     </div>
                                     <button onclick="removeProcess(${p.id})" class="no-print p-2.5 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all">
                                         <i data-lucide="trash-2" class="w-6 h-6"></i>
@@ -446,6 +454,7 @@
                                         <div class="flex-1">
                                             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">ต้นทาง</label>
                                             <input type="text" value="${p.origin}" oninput="updateProcess(${p.id}, 'origin', this.value)" class="w-full bg-transparent font-bold text-slate-700 outline-none text-base" placeholder="ระบุต้นทาง">
+                                            <span class="pdf-mirror font-bold text-slate-700 text-base">${p.origin || '-'}</span>
                                         </div>
                                     </div>
                                     <div class="bg-blue-50/50 p-5 rounded-2xl flex items-center gap-5 border border-blue-50">
@@ -453,18 +462,21 @@
                                         <div class="flex-1">
                                             <label class="text-xs font-bold text-blue-400 uppercase tracking-wider block mb-1">ปลายทาง</label>
                                             <input type="text" value="${p.destination}" oninput="updateProcess(${p.id}, 'destination', this.value)" class="w-full bg-transparent font-bold text-blue-700 outline-none text-base" placeholder="ระบุปลายทาง">
+                                            <span class="pdf-mirror font-bold text-blue-700 text-base">${p.destination || '-'}</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-6 pt-2">
-                                    <div>
+                                    <div class="flex flex-col">
                                         <label class="text-xs font-bold text-slate-400 uppercase mb-3 block ml-2 tracking-wider">วันที่เริ่ม</label>
                                         <input type="date" value="${p.start}" onchange="updateProcess(${p.id}, 'start', this.value)" class="w-full bg-white border border-slate-100 p-4 rounded-xl font-bold text-slate-600 text-base outline-none focus:ring-4 ring-blue-50 transition-all">
+                                        <span class="pdf-mirror font-bold text-slate-600 text-base ml-2">${formatDateThai(p.start)}</span>
                                     </div>
-                                    <div>
+                                    <div class="flex flex-col">
                                         <label class="text-xs font-bold text-slate-400 uppercase mb-3 block ml-2 tracking-wider">วันที่สิ้นสุด</label>
                                         <input type="date" value="${p.end}" onchange="updateProcess(${p.id}, 'end', this.value)" class="w-full bg-white border border-slate-100 p-4 rounded-xl font-bold text-slate-600 text-base outline-none focus:ring-4 ring-blue-50 transition-all">
+                                        <span class="pdf-mirror font-bold text-slate-600 text-base ml-2">${formatDateThai(p.end)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -503,21 +515,27 @@
 
             const netDuration = (firstStart && lastEnd) ? calculateDays(firstStart, lastEnd) : 0;
             
+            // อัปเดตข้อมูล UI
             document.getElementById('totalDaysHeader').innerText = netDuration;
             document.getElementById('summaryTotalDays').innerText = netDuration;
             document.getElementById('summaryStart').innerText = formatDateThai(firstStart);
             document.getElementById('summaryEnd').innerText = formatDateThai(lastEnd);
             document.getElementById('summaryOrigin').innerText = project.processes.length > 0 ? (project.processes[0].origin || "ไม่ระบุ") : "ไม่ระบุ";
             document.getElementById('summaryDestination').innerText = project.processes.length > 0 ? (project.processes[project.processes.length - 1].destination || "ไม่ระบุ") : "ไม่ระบุ";
+
+            // อัปเดตข้อมูล Mirror สำหรับ PDF
+            document.getElementById('projectName-mirror').innerText = project.name;
+            document.getElementById('projectArea-mirror').innerText = project.area;
+            document.getElementById('serviceProvider-mirror').innerText = project.serviceProvider;
+            document.getElementById('projectStatus-mirror').innerText = project.status;
         }
 
         async function downloadPDF() {
             const project = projects.find(p => p.id === activeProjectId);
             document.body.classList.add('is-generating-pdf');
             
-            // ปรับปรุงการตั้งค่า PDF Options เพื่อแก้ปัญหา Content ตกหล่น
             const opt = {
-                margin: [10, 10, 10, 10], // top, left, bottom, right (mm)
+                margin: [10, 10, 10, 10],
                 filename: `Logistics_${project.name}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
@@ -527,12 +545,11 @@
                     logging: false
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // บังคับให้ตรวจสอบ CSS page-break
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
             try {
-                // รอสักครู่เพื่อให้ CSS .is-generating-pdf ทำงานเต็มที่
-                await new Promise(r => setTimeout(r, 300));
+                await new Promise(r => setTimeout(r, 400)); // รอให้ CSS ทำงานเต็มที่
                 const element = document.getElementById('main-content');
                 await html2pdf().set(opt).from(element).save();
             } finally {
