@@ -43,7 +43,7 @@
         }
         .process-card:last-child .connector-line::before { display: none; }
 
-        /* PDF Styles - ป้องกันตัวอักษรเพี้ยนและสระลอย */
+        /* PDF Styles - ปรับปรุงเพื่อความกระชับและไม่แยกหน้าพร่ำเพรื่อ */
         .pdf-mirror { display: none; }
 
         .is-generating-pdf .no-print { display: none !important; }
@@ -51,19 +51,23 @@
         .is-generating-pdf select { display: none !important; }
         .is-generating-pdf .pdf-mirror { display: inline-block !important; }
         
-        /* แก้ปัญหาสระลอยโดยการ reset ระยะห่างตัวอักษร */
         .is-generating-pdf * {
             letter-spacing: normal !important;
-            line-height: 1.4 !important;
+            line-height: 1.2 !important;
             text-transform: none !important;
         }
 
+        /* ลด padding และ margin ในโหมด PDF เพื่อประหยัดพื้นที่ */
+        .is-generating-pdf #main-content { padding: 5mm !important; }
+        
         .is-generating-pdf .process-card,
         .is-generating-pdf #summaryCard,
         .is-generating-pdf header { 
             page-break-inside: avoid !important; 
             break-inside: avoid !important;
-            margin-bottom: 1.5rem !important;
+            margin-bottom: 0.75rem !important; /* ลดระยะห่างระหว่างการ์ด */
+            padding: 1.5rem !important; /* ลด padding ภายในการ์ด */
+            border-radius: 1.5rem !important;
             box-shadow: none !important;
             border: 1px solid #e2e8f0 !important;
         }
@@ -71,16 +75,22 @@
         .is-generating-pdf body { background: white !important; }
         .is-generating-pdf main { height: auto !important; overflow: visible !important; }
         
-        /* ปรับโครงสร้างกล่องระยะเวลาใน PDF ให้เรียบง่าย */
         .is-generating-pdf .duration-box {
             background-color: var(--primary) !important;
             color: white !important;
             border-radius: 1rem !important;
-            padding: 1rem !important;
-            min-width: 120px !important;
+            padding: 0.75rem !important;
+            min-width: 100px !important;
             text-align: center !important;
             display: block !important;
         }
+
+        .is-generating-pdf #summaryCard {
+            padding: 2rem !important;
+            margin-top: 1rem !important;
+        }
+
+        .is-generating-pdf #summaryCard h3 { margin-bottom: 1.5rem !important; }
     </style>
 </head>
 <body class="bg-[#F8FAFC] text-slate-900 min-h-screen flex flex-col md:flex-row overflow-x-hidden">
@@ -119,7 +129,7 @@
         <div class="p-4 bg-slate-50 border-t border-slate-100">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 text-[10px]">ระบบจัดการโลจิสติกส์</p>
-                <p class="text-[9px] text-slate-300 font-medium tracking-tight">V 2.3 (Final Fix)</p>
+                <p class="text-[9px] text-slate-300 font-medium tracking-tight">V 2.3 (Compact PDF Mode)</p>
             </div>
         </div>
     </aside>
@@ -153,7 +163,7 @@
                             <input type="text" id="projectName" oninput="updateProject('name', this.value)" 
                                    class="text-4xl font-black text-slate-900 bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
                                    placeholder="ชื่อโปรเจกต์...">
-                            <span id="projectName-mirror" class="pdf-mirror text-4xl font-black text-slate-900"></span>
+                            <span id="projectName-mirror" class="pdf-mirror text-3xl font-black text-slate-900"></span>
                             
                             <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
                                 <div class="flex items-center gap-3 text-slate-500">
@@ -161,7 +171,7 @@
                                     <input type="text" id="projectArea" oninput="updateProject('area', this.value)" 
                                            class="text-lg font-semibold bg-transparent border-none focus:outline-none w-36 p-0" 
                                            placeholder="รหัสพื้นที่...">
-                                    <span id="projectArea-mirror" class="pdf-mirror text-lg font-semibold text-slate-700"></span>
+                                    <span id="projectArea-mirror" class="pdf-mirror text-base font-semibold text-slate-700"></span>
                                 </div>
                                 <div class="w-px h-5 bg-slate-200 hidden sm:block no-print"></div>
                                 <div class="flex items-center gap-3 text-slate-500">
@@ -169,7 +179,7 @@
                                     <input type="text" id="serviceProvider" oninput="updateProject('serviceProvider', this.value)" 
                                            class="text-lg font-semibold bg-transparent border-none focus:outline-none w-56 p-0" 
                                            placeholder="ชื่อผู้ให้บริการ...">
-                                    <span id="serviceProvider-mirror" class="pdf-mirror text-lg font-semibold text-slate-700"></span>
+                                    <span id="serviceProvider-mirror" class="pdf-mirror text-base font-semibold text-slate-700"></span>
                                 </div>
                             </div>
                         </div>
@@ -189,11 +199,10 @@
                         </div>
                     </div>
 
-                    <div class="bg-blue-600 px-10 py-8 rounded-[2rem] text-white flex flex-col items-center justify-center shadow-2xl shadow-blue-200 min-w-[180px]">
-                        <p class="text-xs font-bold uppercase tracking-[0.2em] opacity-80 mb-2 no-print">เวลารวม</p>
-                        <p class="pdf-mirror text-[10px] font-bold uppercase mb-2">ระยะเวลารวม</p>
+                    <div class="bg-blue-600 px-10 py-8 rounded-[2rem] text-white flex flex-col items-center justify-center shadow-2xl shadow-blue-200 min-w-[150px]">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80 mb-2">ระยะเวลารวม</p>
                         <div class="flex items-baseline gap-1">
-                            <span id="totalDaysHeader" class="text-6xl font-black">0</span>
+                            <span id="totalDaysHeader" class="text-5xl font-black">0</span>
                             <span class="text-lg font-bold opacity-80">วัน</span>
                         </div>
                     </div>
@@ -201,7 +210,7 @@
             </div>
 
             <!-- Process Container -->
-            <div id="processContainer" class="space-y-8">
+            <div id="processContainer" class="space-y-6">
                 <!-- Rows injected by JS -->
             </div>
 
@@ -212,14 +221,14 @@
             </button>
 
             <!-- Summary Card -->
-            <div id="summaryCard" class="mt-16 bg-slate-900 rounded-[2.5rem] p-10 md:p-14 text-white shadow-2xl relative overflow-hidden">
+            <div id="summaryCard" class="mt-12 bg-slate-900 rounded-[2.5rem] p-10 md:p-14 text-white shadow-2xl relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full -mr-24 -mt-24 blur-3xl no-print"></div>
-                <h3 class="text-2xl font-bold mb-12 flex items-center gap-4 relative z-10">
+                <h3 class="text-2xl font-bold mb-10 flex items-center gap-4 relative z-10">
                     <i data-lucide="calendar-check" class="text-blue-400 w-8 h-8 no-print"></i>
                     ระยะเวลาโครงการรวม
                 </h3>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-14 items-center relative z-10 text-center">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-10 items-center relative z-10 text-center">
                     <div class="space-y-3">
                         <p class="text-blue-400 text-xs font-bold uppercase tracking-widest">จุดเริ่มงาน</p>
                         <p id="summaryStart" class="text-4xl font-bold tracking-tight">--/--/----</p>
@@ -453,12 +462,12 @@
                 card.innerHTML = `
                     <div class="connector-line no-print"></div>
                     <div class="relative z-10 bg-white rounded-[2.5rem] border border-slate-100 p-8 md:p-10 hover:shadow-2xl hover:shadow-slate-200/50 transition-all">
-                        <div class="flex flex-col md:flex-row gap-10">
+                        <div class="flex flex-col md:flex-row gap-8 lg:gap-10">
                             <div class="flex-1 space-y-7">
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
                                         <p class="text-xs font-black text-blue-600 uppercase tracking-widest mb-2 no-print">Step 0${index + 1}</p>
-                                        <p class="pdf-mirror text-xs font-black text-blue-600 mb-2">ขั้นตอนที่ 0${index + 1}</p>
+                                        <p class="pdf-mirror text-xs font-black text-blue-600 mb-1">ขั้นตอนที่ 0${index + 1}</p>
                                         <input type="text" value="${p.name}" oninput="updateProcess(${p.id}, 'name', this.value)" 
                                                class="text-2xl font-bold bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
                                                placeholder="ชื่อขั้นตอนการทำงาน...">
@@ -508,7 +517,7 @@
 
                             <div class="duration-box md:w-48 flex flex-col items-center justify-center bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-100">
                                 <p class="text-xs font-bold uppercase mb-2 opacity-70 no-print">ระยะเวลา</p>
-                                <p class="pdf-mirror text-[10px] font-bold mb-2">ระยะเวลา</p>
+                                <p class="pdf-mirror text-[10px] font-bold mb-1">ระยะเวลา</p>
                                 <div class="text-5xl font-black mb-1">${days}</div>
                                 <p class="text-xs font-bold uppercase opacity-70">วัน</p>
                             </div>
@@ -558,17 +567,17 @@
             document.body.classList.add('is-generating-pdf');
             
             const opt = {
-                margin: [10, 10, 10, 10],
+                margin: [10, 10, 10, 10], // top, left, bottom, right (mm)
                 filename: `Logistics_${project.name}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
-                    scale: 2, 
+                    scale: 1.5, // ลดสเกลลงเล็กน้อยเพื่อให้พอดีหน้า
                     useCORS: true,
                     letterRendering: true,
                     logging: false
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                pagebreak: { mode: ['css', 'legacy'] } // ใช้ CSS เป็นหลักในการควบคุมการขึ้นหน้าใหม่
             };
 
             try {
