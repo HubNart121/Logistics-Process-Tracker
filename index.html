@@ -43,7 +43,7 @@
         }
         .process-card:last-child .connector-line::before { display: none; }
 
-        /* PDF Styles - แก้ไขปัญหาตัวหนังสือตกหล่นและ input เพี้ยน */
+        /* PDF Styles - ป้องกันตัวอักษรเพี้ยนและสระลอย */
         .pdf-mirror { display: none; }
 
         .is-generating-pdf .no-print { display: none !important; }
@@ -51,17 +51,36 @@
         .is-generating-pdf select { display: none !important; }
         .is-generating-pdf .pdf-mirror { display: inline-block !important; }
         
+        /* แก้ปัญหาสระลอยโดยการ reset ระยะห่างตัวอักษร */
+        .is-generating-pdf * {
+            letter-spacing: normal !important;
+            line-height: 1.4 !important;
+            text-transform: none !important;
+        }
+
         .is-generating-pdf .process-card,
         .is-generating-pdf #summaryCard,
         .is-generating-pdf header { 
             page-break-inside: avoid !important; 
             break-inside: avoid !important;
-            margin-bottom: 2rem !important;
-            border: 1px solid #f1f5f9 !important; /* เพิ่มเส้นขอบจางๆ ให้ PDF ดูคมชัด */
+            margin-bottom: 1.5rem !important;
+            box-shadow: none !important;
+            border: 1px solid #e2e8f0 !important;
         }
 
         .is-generating-pdf body { background: white !important; }
         .is-generating-pdf main { height: auto !important; overflow: visible !important; }
+        
+        /* ปรับโครงสร้างกล่องระยะเวลาใน PDF ให้เรียบง่าย */
+        .is-generating-pdf .duration-box {
+            background-color: var(--primary) !important;
+            color: white !important;
+            border-radius: 1rem !important;
+            padding: 1rem !important;
+            min-width: 120px !important;
+            text-align: center !important;
+            display: block !important;
+        }
     </style>
 </head>
 <body class="bg-[#F8FAFC] text-slate-900 min-h-screen flex flex-col md:flex-row overflow-x-hidden">
@@ -72,7 +91,7 @@
             <div class="bg-blue-600 p-2 rounded-lg text-white">
                 <i data-lucide="truck" class="w-5 h-5"></i>
             </div>
-            <span class="font-bold text-xl tracking-tight">LT Pro</span>
+            <span class="font-bold text-xl tracking-tight text-blue-600">LT TRACKER</span>
         </div>
         <button onclick="toggleSidebar()" class="p-2 hover:bg-slate-100 rounded-xl">
             <i data-lucide="menu" class="w-7 h-7"></i>
@@ -99,8 +118,8 @@
 
         <div class="p-4 bg-slate-50 border-t border-slate-100">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">แอปพลิเคชันจัดการโลจิสติกส์</p>
-                <p class="text-[10px] text-slate-300 font-medium">VERSION 2.2 (Report Optimized)</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 text-[10px]">ระบบจัดการโลจิสติกส์</p>
+                <p class="text-[9px] text-slate-300 font-medium tracking-tight">V 2.3 (Final Fix)</p>
             </div>
         </div>
     </aside>
@@ -144,7 +163,7 @@
                                            placeholder="รหัสพื้นที่...">
                                     <span id="projectArea-mirror" class="pdf-mirror text-lg font-semibold text-slate-700"></span>
                                 </div>
-                                <div class="w-px h-5 bg-slate-200 hidden sm:block"></div>
+                                <div class="w-px h-5 bg-slate-200 hidden sm:block no-print"></div>
                                 <div class="flex items-center gap-3 text-slate-500">
                                     <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Provider:</span>
                                     <input type="text" id="serviceProvider" oninput="updateProject('serviceProvider', this.value)" 
@@ -171,7 +190,8 @@
                     </div>
 
                     <div class="bg-blue-600 px-10 py-8 rounded-[2rem] text-white flex flex-col items-center justify-center shadow-2xl shadow-blue-200 min-w-[180px]">
-                        <p class="text-xs font-bold uppercase tracking-[0.2em] opacity-80 mb-2">เวลารวม</p>
+                        <p class="text-xs font-bold uppercase tracking-[0.2em] opacity-80 mb-2 no-print">เวลารวม</p>
+                        <p class="pdf-mirror text-[10px] font-bold uppercase mb-2">ระยะเวลารวม</p>
                         <div class="flex items-baseline gap-1">
                             <span id="totalDaysHeader" class="text-6xl font-black">0</span>
                             <span class="text-lg font-bold opacity-80">วัน</span>
@@ -193,9 +213,9 @@
 
             <!-- Summary Card -->
             <div id="summaryCard" class="mt-16 bg-slate-900 rounded-[2.5rem] p-10 md:p-14 text-white shadow-2xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full -mr-24 -mt-24 blur-3xl"></div>
+                <div class="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full -mr-24 -mt-24 blur-3xl no-print"></div>
                 <h3 class="text-2xl font-bold mb-12 flex items-center gap-4 relative z-10">
-                    <i data-lucide="calendar-check" class="text-blue-400 w-8 h-8"></i>
+                    <i data-lucide="calendar-check" class="text-blue-400 w-8 h-8 no-print"></i>
                     ระยะเวลาโครงการรวม
                 </h3>
                 
@@ -228,17 +248,17 @@
     </main>
 
     <!-- Custom Confirm Dialog -->
-    <div id="customDialog" class="fixed inset-0 z-[120] hidden items-center justify-center p-4">
+    <div id="customDialog" class="fixed inset-0 z-[120] hidden items-center justify-center p-4 no-print">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
         <div class="relative bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl text-center">
             <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5">
                 <i data-lucide="alert-triangle" class="w-10 h-10"></i>
             </div>
-            <h3 id="dialogTitle" class="text-2xl font-black mb-3 text-slate-900">ยืนยันการลบ?</h3>
-            <p id="dialogMessage" class="text-slate-500 text-base mb-8 px-4">ข้อมูลจะถูกลบถาวร ไม่สามารถย้อนกลับได้</p>
+            <h3 id="dialogTitle" class="text-2xl font-black mb-3 text-slate-900 text-transform-none">ยืนยันการลบ?</h3>
+            <p id="dialogMessage" class="text-slate-500 text-base mb-8 px-4 text-transform-none">ข้อมูลจะถูกลบถาวร ไม่สามารถย้อนกลับได้</p>
             <div class="flex gap-4">
                 <button id="dialogCancel" class="flex-1 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 text-lg transition-colors">ยกเลิก</button>
-                <button id="dialogConfirm" class="flex-1 py-4 bg-red-500 text-white font-bold rounded-2xl hover:bg-red-600 shadow-lg shadow-red-100 text-lg transition-colors">ยืนยันลบ</button>
+                <button id="dialogConfirm" class="flex-1 py-4 bg-red-500 text-white font-bold rounded-2xl hover:bg-red-600 shadow-lg shadow-red-100 text-lg transition-colors text-transform-none">ยืนยันลบ</button>
             </div>
         </div>
     </div>
@@ -317,7 +337,7 @@
                 project[field] = value;
                 save();
                 if (field === 'name') renderSidebar();
-                updateSummaryData(); // เพื่ออัปเดต Mirror ทันทีที่พิมพ์
+                updateSummaryData();
             }
         }
 
@@ -437,7 +457,8 @@
                             <div class="flex-1 space-y-7">
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
-                                        <p class="text-xs font-black text-blue-600 uppercase tracking-widest mb-2">Step 0${index + 1}</p>
+                                        <p class="text-xs font-black text-blue-600 uppercase tracking-widest mb-2 no-print">Step 0${index + 1}</p>
+                                        <p class="pdf-mirror text-xs font-black text-blue-600 mb-2">ขั้นตอนที่ 0${index + 1}</p>
                                         <input type="text" value="${p.name}" oninput="updateProcess(${p.id}, 'name', this.value)" 
                                                class="text-2xl font-bold bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
                                                placeholder="ชื่อขั้นตอนการทำงาน...">
@@ -450,17 +471,19 @@
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div class="bg-slate-50 p-5 rounded-2xl flex items-center gap-5 border border-slate-100/50">
-                                        <div class="bg-white p-3 rounded-xl text-slate-400 shadow-sm"><i data-lucide="arrow-up-right" class="w-5 h-5"></i></div>
+                                        <div class="bg-white p-3 rounded-xl text-slate-400 shadow-sm no-print"><i data-lucide="arrow-up-right" class="w-5 h-5"></i></div>
                                         <div class="flex-1">
-                                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">ต้นทาง</label>
+                                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1 no-print">ต้นทาง</label>
+                                            <p class="pdf-mirror text-[10px] font-bold text-slate-400 mb-1">ต้นทาง</p>
                                             <input type="text" value="${p.origin}" oninput="updateProcess(${p.id}, 'origin', this.value)" class="w-full bg-transparent font-bold text-slate-700 outline-none text-base" placeholder="ระบุต้นทาง">
                                             <span class="pdf-mirror font-bold text-slate-700 text-base">${p.origin || '-'}</span>
                                         </div>
                                     </div>
                                     <div class="bg-blue-50/50 p-5 rounded-2xl flex items-center gap-5 border border-blue-50">
-                                        <div class="bg-blue-600 p-3 rounded-xl text-white shadow-lg shadow-blue-100"><i data-lucide="map-pin" class="w-5 h-5"></i></div>
+                                        <div class="bg-blue-600 p-3 rounded-xl text-white shadow-lg shadow-blue-100 no-print"><i data-lucide="map-pin" class="w-5 h-5"></i></div>
                                         <div class="flex-1">
-                                            <label class="text-xs font-bold text-blue-400 uppercase tracking-wider block mb-1">ปลายทาง</label>
+                                            <label class="text-xs font-bold text-blue-400 uppercase tracking-wider block mb-1 no-print">ปลายทาง</label>
+                                            <p class="pdf-mirror text-[10px] font-bold text-blue-400 mb-1">ปลายทาง</p>
                                             <input type="text" value="${p.destination}" oninput="updateProcess(${p.id}, 'destination', this.value)" class="w-full bg-transparent font-bold text-blue-700 outline-none text-base" placeholder="ระบุปลายทาง">
                                             <span class="pdf-mirror font-bold text-blue-700 text-base">${p.destination || '-'}</span>
                                         </div>
@@ -469,20 +492,23 @@
 
                                 <div class="grid grid-cols-2 gap-6 pt-2">
                                     <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-400 uppercase mb-3 block ml-2 tracking-wider">วันที่เริ่ม</label>
+                                        <label class="text-xs font-bold text-slate-400 uppercase mb-3 block ml-2 tracking-wider no-print">วันที่เริ่ม</label>
+                                        <p class="pdf-mirror text-[10px] font-bold text-slate-400 mb-1 ml-2">วันที่เริ่ม</p>
                                         <input type="date" value="${p.start}" onchange="updateProcess(${p.id}, 'start', this.value)" class="w-full bg-white border border-slate-100 p-4 rounded-xl font-bold text-slate-600 text-base outline-none focus:ring-4 ring-blue-50 transition-all">
                                         <span class="pdf-mirror font-bold text-slate-600 text-base ml-2">${formatDateThai(p.start)}</span>
                                     </div>
                                     <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-400 uppercase mb-3 block ml-2 tracking-wider">วันที่สิ้นสุด</label>
+                                        <label class="text-xs font-bold text-slate-400 uppercase mb-3 block ml-2 tracking-wider no-print">วันที่สิ้นสุด</label>
+                                        <p class="pdf-mirror text-[10px] font-bold text-slate-400 mb-1 ml-2">วันที่สิ้นสุด</p>
                                         <input type="date" value="${p.end}" onchange="updateProcess(${p.id}, 'end', this.value)" class="w-full bg-white border border-slate-100 p-4 rounded-xl font-bold text-slate-600 text-base outline-none focus:ring-4 ring-blue-50 transition-all">
                                         <span class="pdf-mirror font-bold text-slate-600 text-base ml-2">${formatDateThai(p.end)}</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="md:w-48 flex flex-col items-center justify-center bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-100">
-                                <p class="text-xs font-bold uppercase tracking-widest mb-2 opacity-70">ระยะเวลา</p>
+                            <div class="duration-box md:w-48 flex flex-col items-center justify-center bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-100">
+                                <p class="text-xs font-bold uppercase mb-2 opacity-70 no-print">ระยะเวลา</p>
+                                <p class="pdf-mirror text-[10px] font-bold mb-2">ระยะเวลา</p>
                                 <div class="text-5xl font-black mb-1">${days}</div>
                                 <p class="text-xs font-bold uppercase opacity-70">วัน</p>
                             </div>
@@ -498,7 +524,6 @@
 
         function updateSummaryData() {
             const project = projects.find(p => p.id === activeProjectId);
-            let total = 0;
             let firstStart = null;
             let lastEnd = null;
 
@@ -515,7 +540,6 @@
 
             const netDuration = (firstStart && lastEnd) ? calculateDays(firstStart, lastEnd) : 0;
             
-            // อัปเดตข้อมูล UI
             document.getElementById('totalDaysHeader').innerText = netDuration;
             document.getElementById('summaryTotalDays').innerText = netDuration;
             document.getElementById('summaryStart').innerText = formatDateThai(firstStart);
@@ -523,7 +547,6 @@
             document.getElementById('summaryOrigin').innerText = project.processes.length > 0 ? (project.processes[0].origin || "ไม่ระบุ") : "ไม่ระบุ";
             document.getElementById('summaryDestination').innerText = project.processes.length > 0 ? (project.processes[project.processes.length - 1].destination || "ไม่ระบุ") : "ไม่ระบุ";
 
-            // อัปเดตข้อมูล Mirror สำหรับ PDF
             document.getElementById('projectName-mirror').innerText = project.name;
             document.getElementById('projectArea-mirror').innerText = project.area;
             document.getElementById('serviceProvider-mirror').innerText = project.serviceProvider;
@@ -549,7 +572,7 @@
             };
 
             try {
-                await new Promise(r => setTimeout(r, 400)); // รอให้ CSS ทำงานเต็มที่
+                await new Promise(r => setTimeout(r, 400));
                 const element = document.getElementById('main-content');
                 await html2pdf().set(opt).from(element).save();
             } finally {
