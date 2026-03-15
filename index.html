@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logistic Tracker - ระบบจัดการหลายโปรเจกต์พร้อม AI</title>
+    <title>Logistic Tracker Pro - Managed Supply Chain</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap');
         
         :root {
-            --primary-blue: #2563eb;
-            --dark-slate: #0f172a;
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
         }
 
         body { 
@@ -20,160 +20,152 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        .connector-line::before {
-            content: '';
-            position: absolute;
-            left: 1.75rem;
-            top: 4rem;
-            bottom: -1.5rem;
-            width: 2px;
-            background-color: #e2e8f0;
-            z-index: 0;
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+        .process-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+        
         @media (min-width: 768px) {
-            .connector-line::before { left: 2rem; bottom: -2rem; }
+            .connector-line::before {
+                content: '';
+                position: absolute;
+                left: 2rem;
+                top: 5rem;
+                bottom: -2rem;
+                width: 2px;
+                background: repeating-linear-gradient(to bottom, #e2e8f0 0, #e2e8f0 10px, transparent 10px, transparent 20px);
+                z-index: 0;
+            }
         }
         .process-card:last-child .connector-line::before { display: none; }
 
-        .pdf-mirror { display: none; }
-        .pdf-header { display: none; }
-        
-        .is-generating-pdf .pdf-mirror { display: inline-block !important; }
-        .is-generating-pdf input, .is-generating-pdf select, .is-generating-pdf .no-print, .is-generating-pdf .ai-ignore { display: none !important; }
-        .is-generating-pdf .pdf-header { display: block !important; border-bottom: 2px solid var(--primary-blue); padding-bottom: 1rem; margin-bottom: 2rem; }
-        .is-generating-pdf .process-card { page-break-inside: avoid; margin-bottom: 1.5rem; }
-
-        .active-project {
-            background-color: #eff6ff;
-            border-left: 4px solid #2563eb;
-            color: #1e40af;
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #f8fafc; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-        /* AI Result Styling */
-        .ai-content h3 { font-weight: bold; font-size: 1.1rem; color: #1e40af; margin-top: 1rem; margin-bottom: 0.5rem; }
-        .ai-content p { margin-bottom: 0.75rem; line-height: 1.6; }
-        .ai-content ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
-        .ai-content li { margin-bottom: 0.25rem; }
+        /* PDF Styles */
+        .is-generating-pdf .no-print { display: none !important; }
+        .is-generating-pdf .pdf-only { display: block !important; }
+        .is-generating-pdf input, .is-generating-pdf select { border: none !important; background: transparent !important; appearance: none !important; padding: 0 !important; }
+        .is-generating-pdf .process-card { page-break-inside: avoid; margin-bottom: 1.5rem; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col md:flex-row">
+<body class="bg-[#F8FAFC] text-slate-900 min-h-screen flex flex-col md:flex-row overflow-x-hidden">
 
-    <!-- Sidebar: Project List -->
-    <aside id="sidebar" class="no-print w-full md:w-72 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col h-auto md:h-screen sticky top-0 z-40">
+    <!-- Mobile Header -->
+    <header class="md:hidden glass-effect sticky top-0 z-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center no-print">
+        <div class="flex items-center gap-2">
+            <div class="bg-blue-600 p-2 rounded-lg text-white">
+                <i data-lucide="truck" class="w-5 h-5"></i>
+            </div>
+            <span class="font-bold text-lg tracking-tight">LT Pro</span>
+        </div>
+        <button onclick="toggleSidebar()" class="p-2 hover:bg-slate-100 rounded-xl">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+    </header>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="no-print fixed inset-y-0 left-0 z-[60] w-72 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col transition-transform duration-300 -translate-x-full md:translate-x-0 md:relative">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-            <h2 class="font-bold text-slate-900 flex items-center gap-2">
-                <i data-lucide="folders" class="text-blue-600 w-5 h-5"></i>
-                โปรเจกต์ทั้งหมด
-            </h2>
-            <button onclick="addProject()" class="p-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors" title="สร้างโปรเจกต์ใหม่">
-                <i data-lucide="plus" class="w-4 h-4"></i>
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-200 text-white">
+                    <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                </div>
+                <h2 class="font-extrabold text-slate-900 tracking-tight">LT TRACKER</h2>
+            </div>
+            <button onclick="addProject()" class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors" title="สร้างโปรเจกต์ใหม่">
+                <i data-lucide="plus" class="w-5 h-5"></i>
             </button>
         </div>
         
-        <div id="projectList" class="flex-1 overflow-y-auto p-3 space-y-1">
+        <div id="projectList" class="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
             <!-- Project items injected here -->
         </div>
 
-        <div class="p-4 bg-slate-50 border-t border-slate-100 text-[10px] text-slate-400 text-center">
-            แอปพลิเคชันสำหรับวางแผนโลจิสติกส์
+        <div class="p-4 bg-slate-50 border-t border-slate-100">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">แอปพลิเคชันจัดการโลจิสติกส์</p>
+                <p class="text-[10px] text-slate-300">V 2.0 (No AI Mode)</p>
+            </div>
         </div>
     </aside>
 
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/40 z-[55] hidden backdrop-blur-sm md:hidden"></div>
+
     <!-- Main Content -->
-    <main class="flex-1 min-w-0">
-        <div id="main-content" class="max-w-5xl mx-auto p-4 sm:p-6 md:p-8">
+    <main class="flex-1 min-w-0 relative h-screen overflow-y-auto custom-scrollbar">
+        <div id="main-content" class="max-w-5xl mx-auto p-4 sm:p-8 pb-24">
             
-            <!-- PDF Only Header -->
-            <div class="pdf-header p-6">
-                <div class="flex justify-between items-end">
-                    <div>
-                        <h1 class="text-3xl font-bold text-blue-700">Logistic Tracking Report</h1>
-                        <p class="text-slate-500">รายงานสรุปขั้นตอนการขนส่งสินค้า</p>
+            <!-- Header Card -->
+            <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-6 md:p-8 mb-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-blue-50/50 rounded-full -mr-32 -mt-32 blur-3xl no-print"></div>
+                
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
+                    <div class="flex-1 space-y-4">
+                        <div class="flex items-center gap-3 no-print">
+                            <span class="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-widest rounded-full border border-blue-100">Project Workspace</span>
+                            <div class="flex gap-2">
+                                <button onclick="downloadPDF()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-400" title="พิมพ์รายงาน PDF">
+                                    <i data-lucide="printer" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="shareProject()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-400" title="แชร์ข้อความสถานะ">
+                                    <i data-lucide="share-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <input type="text" id="projectName" oninput="updateProject('name', this.value)" 
+                                   class="text-3xl font-black text-slate-900 bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
+                                   placeholder="ชื่อโปรเจกต์...">
+                            <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                <div class="flex items-center gap-2 text-slate-500">
+                                    <span class="text-xs font-bold text-slate-300 uppercase">Area</span>
+                                    <input type="text" id="projectArea" oninput="updateProject('area', this.value)" 
+                                           class="text-sm font-semibold bg-transparent border-none focus:outline-none w-32 p-0" 
+                                           placeholder="ระบุรหัสพื้นที่...">
+                                </div>
+                                <div class="w-px h-4 bg-slate-200 hidden sm:block"></div>
+                                <div class="flex items-center gap-2 text-slate-500">
+                                    <span class="text-xs font-bold text-slate-300 uppercase">Provider</span>
+                                    <input type="text" id="serviceProvider" oninput="updateProject('serviceProvider', this.value)" 
+                                           class="text-sm font-semibold bg-transparent border-none focus:outline-none w-48 p-0" 
+                                           placeholder="ชื่อผู้ให้บริการ...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-3 pt-2 no-print">
+                            <div class="flex items-center gap-2 px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-100">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status:</span>
+                                <select id="projectStatus" onchange="updateProject('status', this.value)" 
+                                        class="bg-transparent text-slate-700 font-bold text-xs outline-none cursor-pointer">
+                                    <option value="Kick off">Kick off</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Done">Done</option>
+                                    <option value="Delayed">Delayed</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-right text-sm text-slate-400">
-                        <p>วันที่ออกรายงาน: <span id="reportDate"></span></p>
+
+                    <div class="bg-blue-600 px-8 py-6 rounded-[2rem] text-white flex flex-col items-center justify-center shadow-2xl shadow-blue-200 min-w-[160px]">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80 mb-1">เวลารวม</p>
+                        <div class="flex items-baseline gap-1">
+                            <span id="totalDaysHeader" class="text-5xl font-black">0</span>
+                            <span class="text-sm font-bold opacity-80">วัน</span>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Header Section -->
-            <header class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-8 relative">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div class="flex items-start sm:items-center gap-4 flex-1">
-                        <div class="bg-blue-600 p-3 rounded-2xl shadow-lg shadow-blue-100 text-white shrink-0">
-                            <i data-lucide="truck" class="w-7 h-7"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex flex-wrap items-baseline gap-4 mb-1">
-                                <div class="relative min-w-[300px] flex-1">
-                                    <input type="text" id="projectName" 
-                                           oninput="updateActiveProject('name', this.value)"
-                                           class="text-2xl font-bold bg-transparent border-none focus:outline-none w-full p-0">
-                                    <span id="projectName-mirror" class="pdf-mirror text-2xl font-bold text-slate-800"></span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-lg font-bold text-slate-400 tracking-wider">AREA</span>
-                                    <div class="relative">
-                                        <input type="text" id="projectArea" 
-                                               oninput="updateActiveProject('area', this.value)"
-                                               class="text-xl font-semibold bg-transparent border-none focus:outline-none text-slate-600 w-40 p-0">
-                                        <span id="projectArea-mirror" class="pdf-mirror text-xl font-semibold text-slate-600"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
-                                <div class="flex items-center gap-3">
-                                    <p class="text-slate-400 text-sm">Planning Tool</p>
-                                    <button onclick="downloadPDF()" class="no-print flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg transition-colors border border-blue-100 uppercase">
-                                        <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                                        PDF
-                                    </button>
-                                    
-                                    <!-- Gemini AI Feature Buttons -->
-                                    <button onclick="askAI('insights')" class="ai-ignore no-print flex items-center gap-1.5 text-xs font-bold text-purple-600 hover:text-purple-800 bg-purple-50 px-3 py-1.5 rounded-lg transition-colors border border-purple-100 uppercase">
-                                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                                        ✨ วิเคราะห์ด้วย AI
-                                    </button>
-                                    <button onclick="askAI('email')" class="ai-ignore no-print flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors border border-indigo-100 uppercase">
-                                        <i data-lucide="mail" class="w-3.5 h-3.5"></i>
-                                        ✨ ร่างอีเมล
-                                    </button>
-                                </div>
-
-                                <div class="flex items-center gap-2 border-l border-slate-200 pl-4">
-                                    <span class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">STATUS :</span>
-                                    <select id="projectStatus" onchange="updateActiveProject('status', this.value)" class="text-xs font-bold bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer">
-                                        <option value="Kick off">Kick off</option>
-                                        <option value="In Progress">In Progress</option>
-                                        <option value="Done">Done</option>
-                                    </select>
-                                    <span id="projectStatus-mirror" class="pdf-mirror text-xs font-bold px-3 py-1.5 rounded-lg border"></span>
-                                </div>
-
-                                <div class="flex items-center gap-2 border-l border-slate-200 pl-4">
-                                    <span class="text-sm font-bold text-slate-900 whitespace-nowrap">ผู้ให้บริการ :</span>
-                                    <div class="relative">
-                                        <input type="text" id="serviceProvider" 
-                                               oninput="updateActiveProject('serviceProvider', this.value)"
-                                               class="text-sm font-semibold bg-transparent border-none focus:outline-none text-slate-600 w-40 p-0"
-                                               placeholder="...">
-                                        <span id="serviceProvider-mirror" class="pdf-mirror text-sm font-semibold text-slate-600"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-blue-50/50 px-6 py-4 rounded-3xl border border-blue-50 text-center shrink-0 min-w-[120px]">
-                        <p class="text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-1">เวลารวม</p>
-                        <p class="text-4xl font-black text-blue-700"><span id="totalDurationDisplay">0</span> <span class="text-lg font-medium">วัน</span></p>
-                    </div>
-                </div>
-            </header>
 
             <!-- Process Container -->
             <div id="processContainer" class="space-y-6">
@@ -181,26 +173,24 @@
             </div>
 
             <!-- Add Button -->
-            <div class="px-2 no-print">
-                <button onclick="addProcess()" 
-                        class="w-full mt-8 py-5 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 hover:text-blue-500 hover:border-blue-200 hover:bg-blue-50 transition-all flex items-center justify-center gap-3 font-semibold text-lg">
-                    <i data-lucide="plus-circle" class="w-6 h-6"></i>
-                    เพิ่มขั้นตอนการทำงาน
-                </button>
-            </div>
+            <button onclick="addProcess()" class="no-print w-full mt-10 py-8 border-2 border-dashed border-slate-200 rounded-[2.5rem] text-slate-400 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50/50 transition-all flex flex-col items-center gap-2">
+                <i data-lucide="plus-circle" class="w-10 h-10"></i>
+                <span class="font-bold">เพิ่มขั้นตอนการทำงาน</span>
+            </button>
 
-            <!-- Summary Footer -->
-            <div id="summaryCard" class="mt-12 bg-slate-900 rounded-[2.5rem] p-8 sm:p-10 text-white shadow-2xl">
-                <h3 class="text-xl font-bold mb-10 flex items-center gap-3">
-                    <i data-lucide="award" class="text-blue-400 w-6 h-6"></i>
+            <!-- Summary Card (Dark Theme as in image) -->
+            <div id="summaryCard" class="mt-12 bg-slate-900 rounded-[2.5rem] p-8 sm:p-10 text-white shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                <h3 class="text-xl font-bold mb-10 flex items-center gap-3 relative z-10">
+                    <i data-lucide="calendar-check" class="text-blue-400 w-6 h-6"></i>
                     ระยะเวลาโครงการรวม
                 </h3>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-12 items-center">
-                    <div class="space-y-3 text-center sm:text-left">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-12 items-center relative z-10 text-center">
+                    <div class="space-y-2">
                         <p class="text-blue-400 text-[10px] font-bold uppercase tracking-widest">จุดเริ่มงาน</p>
-                        <p id="summaryStart" class="text-4xl font-bold">-</p>
-                        <p id="summaryOrigin" class="text-slate-500 text-sm font-medium">-</p>
+                        <p id="summaryStart" class="text-3xl font-bold">--/--/----</p>
+                        <p id="summaryOrigin" class="text-slate-500 text-sm font-medium truncate">ไม่ระบุต้นทาง</p>
                     </div>
                     
                     <div class="flex flex-col items-center justify-center">
@@ -214,88 +204,81 @@
                         </div>
                     </div>
 
-                    <div class="space-y-3 text-center sm:text-right">
+                    <div class="space-y-2">
                         <p class="text-blue-400 text-[10px] font-bold uppercase tracking-widest">จุดสิ้นสุด</p>
-                        <p id="summaryEnd" class="text-4xl font-bold">-</p>
-                        <p id="summaryDestination" class="text-slate-500 text-sm font-medium">-</p>
+                        <p id="summaryEnd" class="text-3xl font-bold">--/--/----</p>
+                        <p id="summaryDestination" class="text-slate-500 text-sm font-medium truncate">ไม่ระบุปลายทาง</p>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Modal for AI Results -->
-    <div id="aiModal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-[60] backdrop-blur-sm p-4">
-        <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh]">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-3xl">
-                <div class="flex items-center gap-3">
-                    <div class="bg-purple-600 p-2 rounded-xl text-white">
-                        <i data-lucide="sparkles" class="w-5 h-5"></i>
-                    </div>
-                    <h3 id="aiModalTitle" class="text-xl font-bold text-slate-900">AI Insights</h3>
-                </div>
-                <button onclick="closeAIModal()" class="p-2 hover:bg-slate-200 rounded-full transition-colors">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
+    <!-- Custom Confirm Dialog -->
+    <div id="customDialog" class="fixed inset-0 z-[120] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl text-center">
+            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="alert-triangle" class="w-8 h-8"></i>
             </div>
-            <div id="aiModalContent" class="p-8 overflow-y-auto ai-content text-slate-700">
-                <!-- AI content here -->
+            <h3 id="dialogTitle" class="text-xl font-black mb-2">ยืนยันการลบ?</h3>
+            <p id="dialogMessage" class="text-slate-500 text-sm mb-8">ข้อมูลจะถูกลบถาวร ไม่สามารถย้อนกลับได้</p>
+            <div class="flex gap-3">
+                <button id="dialogCancel" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200">ยกเลิก</button>
+                <button id="dialogConfirm" class="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 shadow-lg shadow-red-100">ยืนยันลบ</button>
             </div>
-            <div class="p-6 border-t border-slate-100 flex justify-end gap-3">
-                <button onclick="copyAIConsent()" class="px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">
-                    คัดลอกข้อความ
-                </button>
-                <button onclick="closeAIModal()" class="px-6 py-2 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-slate-800 transition-colors">
-                    ปิดหน้าต่าง
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-50 text-white backdrop-blur-md">
-        <div class="text-center bg-white p-10 rounded-3xl shadow-2xl border border-slate-100 text-slate-800">
-            <div class="animate-spin rounded-full h-14 w-14 border-4 border-blue-600 border-t-transparent mx-auto mb-6"></div>
-            <p id="loadingText" class="text-xl font-bold">กำลังประมวลผล...</p>
         </div>
     </div>
 
     <script>
-        const apiKey = ""; // Gemini API Key
-
         // State Management
-        let projects = JSON.parse(localStorage.getItem('logistic_projects_v2')) || [
+        let projects = JSON.parse(localStorage.getItem('lt_pro_simple_data')) || [
             {
-                id: 1,
+                id: Date.now(),
                 name: "นำเข้าสินค้าจาก Yiwu มา ไทย",
                 area: "BKK-01",
                 serviceProvider: "Lazada Express",
                 status: "In Progress",
                 processes: [
                     { id: 101, name: "ส่งสินค้าไปยังโกดัง Yiwu", origin: "Supplier A", destination: "โกดัง Yiwu", start: "2026-03-08", end: "2026-03-16" },
-                    { id: 102, name: "ส่งสินค้าจากโกดัง Yiwu มายังโกดังไทย", origin: "โกดัง Yiwu", destination: "โกดังไทย", start: "2026-03-18", end: "2026-03-27" }
+                    { id: 102, name: "ส่งสินค้าจากจีนมายังโกดังไทย", origin: "โกดัง Yiwu", destination: "โกดังไทย", start: "2026-03-18", end: "2026-03-27" }
                 ]
             }
         ];
         let activeProjectId = projects[0].id;
 
+        // Core Functions
         function save() {
-            localStorage.setItem('logistic_projects_v2', JSON.stringify(projects));
+            localStorage.setItem('lt_pro_simple_data', JSON.stringify(projects));
         }
 
-        // Utilities
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+            
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
         function calculateDays(start, end) {
             if (!start || !end) return 0;
-            const s = new Date(start); s.setHours(0,0,0,0);
-            const e = new Date(end); e.setHours(0,0,0,0);
-            const days = Math.ceil((e - s) / (1000 * 60 * 60 * 24));
-            return days >= 0 ? days : 0;
+            const s = new Date(start);
+            const e = new Date(end);
+            const diff = Math.ceil((e - s) / (1000 * 60 * 60 * 24));
+            return diff >= 0 ? diff : 0;
         }
 
         function formatDateThai(dateStr) {
             if (!dateStr) return "-";
-            const d = new Date(dateStr);
-            return isNaN(d.getTime()) ? "-" : `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth() + 1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+            const date = new Date(dateStr);
+            if (isNaN(date)) return "-";
+            return date.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
         }
 
         // Project Actions
@@ -303,7 +286,7 @@
             const newId = Date.now();
             projects.push({
                 id: newId,
-                name: `โปรเจกต์ใหม่`,
+                name: "โปรเจกต์ใหม่",
                 area: "",
                 serviceProvider: "",
                 status: "Kick off",
@@ -312,31 +295,42 @@
             activeProjectId = newId;
             save();
             render();
+            if (window.innerWidth < 768) toggleSidebar();
         }
 
-        function deleteProject(id, event) {
-            event.stopPropagation();
-            if (projects.length === 1) return;
-            if (confirm("ต้องการลบโปรเจกต์นี้?")) {
-                projects = projects.filter(p => p.id !== id);
-                if (activeProjectId === id) activeProjectId = projects[0].id;
-                save();
-                render();
-            }
-        }
-
-        function updateActiveProject(field, value) {
+        function updateProject(field, value) {
             const project = projects.find(p => p.id === activeProjectId);
             if (project) {
                 project[field] = value;
                 save();
-                if (field === 'name') {
-                    document.getElementById('projectName-mirror').innerText = value;
-                    renderSidebar();
-                }
-                if (field === 'area') document.getElementById('projectArea-mirror').innerText = value;
-                if (field === 'serviceProvider') document.getElementById('serviceProvider-mirror').innerText = value;
-                if (field === 'status') syncStatusMirror(value);
+                if (field === 'name') renderSidebar();
+            }
+        }
+
+        async function showConfirm(title, message) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('customDialog');
+                document.getElementById('dialogTitle').innerText = title;
+                document.getElementById('dialogMessage').innerText = message;
+                modal.classList.replace('hidden', 'flex');
+                
+                const onCancel = () => { modal.classList.replace('flex', 'hidden'); resolve(false); };
+                const onConfirm = () => { modal.classList.replace('flex', 'hidden'); resolve(true); };
+                
+                document.getElementById('dialogCancel').onclick = onCancel;
+                document.getElementById('dialogConfirm').onclick = onConfirm;
+            });
+        }
+
+        async function deleteProject(id, event) {
+            event.stopPropagation();
+            if (projects.length === 1) return;
+            const ok = await showConfirm("ลบโปรเจกต์?", "ข้อมูลทั้งหมดในโปรเจกต์นี้จะถูกลบถาวร");
+            if (ok) {
+                projects = projects.filter(p => p.id !== id);
+                if (activeProjectId === id) activeProjectId = projects[0].id;
+                save();
+                render();
             }
         }
 
@@ -346,7 +340,7 @@
             const last = project.processes[project.processes.length - 1];
             project.processes.push({
                 id: Date.now(),
-                name: "ระบุชื่อขั้นตอน...",
+                name: "",
                 origin: last ? last.destination : "",
                 destination: "",
                 start: last ? last.end : "",
@@ -356,29 +350,24 @@
             render();
         }
 
-        function updateProcess(procId, field, value) {
+        function updateProcess(id, field, value) {
             const project = projects.find(p => p.id === activeProjectId);
-            const proc = project.processes.find(p => p.id === procId);
+            const proc = project.processes.find(p => p.id === id);
             if (proc) {
                 proc[field] = value;
                 save();
-                if (field === 'start' || field === 'end') {
-                    render();
-                } else {
-                    updateSummary();
-                    const idx = project.processes.indexOf(proc);
-                    const card = document.querySelectorAll('.process-card')[idx];
-                    const mirror = card.querySelectorAll('.pdf-mirror')[field === 'name' ? 0 : (field === 'origin' ? 1 : 2)];
-                    if (mirror) mirror.innerText = value;
-                }
+                if (field === 'start' || field === 'end' || field === 'origin' || field === 'destination') render();
             }
         }
 
-        function removeProcess(procId) {
-            const project = projects.find(p => p.id === activeProjectId);
-            project.processes = project.processes.filter(p => p.id !== procId);
-            save();
-            render();
+        async function removeProcess(id) {
+            const ok = await showConfirm("ลบขั้นตอน?", "คุณต้องการลบขั้นตอนนี้ใช่หรือไม่?");
+            if (ok) {
+                const project = projects.find(p => p.id === activeProjectId);
+                project.processes = project.processes.filter(p => p.id !== id);
+                save();
+                render();
+            }
         }
 
         // Rendering
@@ -386,19 +375,20 @@
             const list = document.getElementById('projectList');
             list.innerHTML = '';
             projects.forEach(p => {
-                const item = document.createElement('div');
-                item.className = `group flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all mb-1 ${p.id === activeProjectId ? 'active-project' : 'hover:bg-slate-50 text-slate-500'}`;
-                item.onclick = () => { activeProjectId = p.id; render(); };
-                item.innerHTML = `
+                const isActive = p.id === activeProjectId;
+                const div = document.createElement('div');
+                div.className = `group flex items-center justify-between p-4 rounded-[1.25rem] cursor-pointer transition-all mb-2 ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' : 'hover:bg-slate-50 text-slate-500'}`;
+                div.onclick = () => { activeProjectId = p.id; render(); if (window.innerWidth < 768) toggleSidebar(); };
+                div.innerHTML = `
                     <div class="flex items-center gap-3 overflow-hidden">
-                        <i data-lucide="file-text" class="shrink-0 w-4 h-4"></i>
-                        <span class="text-sm font-semibold truncate">${p.name || 'ไม่มีชื่อโครงการ'}</span>
+                        <i data-lucide="file-text" class="w-4 h-4 shrink-0 opacity-70"></i>
+                        <span class="text-sm font-bold truncate">${p.name || 'Untitled'}</span>
                     </div>
-                    <button onclick="deleteProject(${p.id}, event)" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all no-print">
+                    <button onclick="deleteProject(${p.id}, event)" class="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-white/20 rounded-lg transition-all">
                         <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     </button>
                 `;
-                list.appendChild(item);
+                list.appendChild(div);
             });
             lucide.createIcons();
         }
@@ -407,78 +397,84 @@
             renderSidebar();
             const project = projects.find(p => p.id === activeProjectId);
             
+            // Header Info
             document.getElementById('projectName').value = project.name;
-            document.getElementById('projectName-mirror').innerText = project.name;
-            document.getElementById('projectArea').value = project.area || '';
-            document.getElementById('projectArea-mirror').innerText = project.area || '';
-            document.getElementById('serviceProvider').value = project.serviceProvider || '';
-            document.getElementById('serviceProvider-mirror').innerText = project.serviceProvider || '';
+            document.getElementById('projectArea').value = project.area;
+            document.getElementById('serviceProvider').value = project.serviceProvider;
             document.getElementById('projectStatus').value = project.status;
-            syncStatusMirror(project.status);
 
             const container = document.getElementById('processContainer');
             container.innerHTML = '';
 
-            project.processes.forEach((p) => {
-                const duration = calculateDays(p.start, p.end);
+            let total = 0;
+            let firstStart = null;
+            let lastEnd = null;
+
+            project.processes.forEach((p, index) => {
+                const days = calculateDays(p.start, p.end);
+                total += days;
+
+                if (p.start) {
+                    const sd = new Date(p.start);
+                    if (!firstStart || sd < firstStart) firstStart = sd;
+                }
+                if (p.end) {
+                    const ed = new Date(p.end);
+                    if (!lastEnd || ed > lastEnd) lastEnd = ed;
+                }
+
                 const card = document.createElement('div');
                 card.className = 'process-card relative group';
                 card.innerHTML = `
                     <div class="connector-line no-print"></div>
-                    <div class="relative z-10 bg-white rounded-3xl shadow-sm border border-slate-100 p-6 transition-all hover:shadow-md">
-                        <div class="flex justify-between items-start mb-6">
-                            <div class="flex-1">
-                                <label class="text-sm uppercase font-bold text-blue-600 tracking-wider mb-2 block">ขั้นตอน</label>
-                                <input type="text" oninput="updateProcess(${p.id}, 'name', this.value)" value="${p.name}" 
-                                       class="w-full text-xl font-bold bg-transparent focus:outline-none p-0">
-                                <span class="pdf-mirror text-xl font-bold text-slate-800">${p.name}</span>
-                            </div>
-                            <button onclick="removeProcess(${p.id})" class="no-print text-slate-300 hover:text-red-400 p-2 rounded-xl transition-colors">
-                                <i data-lucide="trash-2" class="w-5 h-5"></i>
-                            </button>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                            <div class="md:col-span-4 space-y-4">
-                                <div class="bg-slate-50/80 p-3.5 rounded-2xl flex items-center gap-3">
-                                    <i data-lucide="map-pin" class="text-slate-400 w-4 h-4 shrink-0"></i>
+                    <div class="relative z-10 bg-white rounded-[2.5rem] border border-slate-100 p-6 md:p-8 hover:shadow-xl hover:shadow-slate-200/50 transition-all">
+                        <div class="flex flex-col md:flex-row gap-8">
+                            <div class="flex-1 space-y-6">
+                                <div class="flex justify-between items-start">
                                     <div class="flex-1">
-                                        <label class="text-xs font-bold text-slate-500 uppercase tracking-normal mb-1 block">ต้นทาง</label>
-                                        <input type="text" oninput="updateProcess(${p.id}, 'origin', this.value)" value="${p.origin}" class="w-full bg-transparent text-base font-semibold focus:outline-none">
-                                        <span class="pdf-mirror text-base font-semibold text-slate-700">${p.origin}</span>
+                                        <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">Step 0${index + 1}</p>
+                                        <input type="text" value="${p.name}" oninput="updateProcess(${p.id}, 'name', this.value)" 
+                                               class="text-xl font-bold bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
+                                               placeholder="ชื่อขั้นตอนการทำงาน...">
+                                    </div>
+                                    <button onclick="removeProcess(${p.id})" class="no-print p-2 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="bg-slate-50 p-4 rounded-2xl flex items-center gap-4">
+                                        <div class="bg-white p-2.5 rounded-xl text-slate-400 shadow-sm"><i data-lucide="arrow-up-right" class="w-4 h-4"></i></div>
+                                        <div class="flex-1">
+                                            <label class="text-[10px] font-bold text-slate-400 uppercase">ต้นทาง</label>
+                                            <input type="text" value="${p.origin}" oninput="updateProcess(${p.id}, 'origin', this.value)" class="w-full bg-transparent font-bold text-slate-700 outline-none text-sm" placeholder="ระบุต้นทาง">
+                                        </div>
+                                    </div>
+                                    <div class="bg-blue-50/50 p-4 rounded-2xl flex items-center gap-4 border border-blue-50">
+                                        <div class="bg-blue-600 p-2.5 rounded-xl text-white shadow-lg shadow-blue-100"><i data-lucide="map-pin" class="w-4 h-4"></i></div>
+                                        <div class="flex-1">
+                                            <label class="text-[10px] font-bold text-blue-400 uppercase">ปลายทาง</label>
+                                            <input type="text" value="${p.destination}" oninput="updateProcess(${p.id}, 'destination', this.value)" class="w-full bg-transparent font-bold text-blue-700 outline-none text-sm" placeholder="ระบุปลายทาง">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="bg-blue-50/30 p-3.5 rounded-2xl border border-blue-50 flex items-center gap-3">
-                                    <i data-lucide="navigation" class="text-blue-500 w-4 h-4 shrink-0"></i>
-                                    <div class="flex-1">
-                                        <label class="text-xs font-bold text-blue-500 uppercase tracking-normal mb-1 block">ปลายทาง</label>
-                                        <input type="text" oninput="updateProcess(${p.id}, 'destination', this.value)" value="${p.destination}" class="w-full bg-transparent text-base font-semibold focus:outline-none">
-                                        <span class="pdf-mirror text-base font-semibold text-blue-700">${p.destination}</span>
+
+                                <div class="grid grid-cols-2 gap-4 pt-2">
+                                    <div>
+                                        <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 block ml-2">วันที่เริ่ม</label>
+                                        <input type="date" value="${p.start}" onchange="updateProcess(${p.id}, 'start', this.value)" class="w-full bg-white border border-slate-100 p-3 rounded-xl font-bold text-slate-600 text-sm outline-none focus:ring-2 ring-blue-50">
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 block ml-2">วันที่สิ้นสุด</label>
+                                        <input type="date" value="${p.end}" onchange="updateProcess(${p.id}, 'end', this.value)" class="w-full bg-white border border-slate-100 p-3 rounded-xl font-bold text-slate-600 text-sm outline-none focus:ring-2 ring-blue-50">
                                     </div>
                                 </div>
                             </div>
-                            <div class="md:col-span-4 grid grid-cols-1 gap-4">
-                                <div class="bg-slate-50/80 p-3.5 rounded-2xl">
-                                    <label class="text-xs font-bold text-slate-500 uppercase tracking-normal block mb-1">เริ่ม</label>
-                                    <div class="flex items-center gap-2">
-                                        <i data-lucide="calendar" class="text-slate-400 w-4 h-4"></i>
-                                        <input type="date" onchange="updateProcess(${p.id}, 'start', this.value)" value="${p.start}" class="w-full bg-transparent text-base font-semibold focus:outline-none">
-                                        <span class="pdf-mirror text-base font-semibold">${formatDateThai(p.start)}</span>
-                                    </div>
-                                </div>
-                                <div class="bg-slate-50/80 p-3.5 rounded-2xl">
-                                    <label class="text-xs font-bold text-slate-500 uppercase tracking-normal block mb-1">สิ้นสุด</label>
-                                    <div class="flex items-center gap-2">
-                                        <i data-lucide="calendar" class="text-slate-400 w-4 h-4"></i>
-                                        <input type="date" onchange="updateProcess(${p.id}, 'end', this.value)" value="${p.end}" class="w-full bg-transparent text-base font-semibold focus:outline-none">
-                                        <span class="pdf-mirror text-base font-semibold">${formatDateThai(p.end)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="md:col-span-4 flex items-center justify-center bg-blue-600 rounded-[2rem] p-6 text-center text-white shadow-lg shadow-blue-200">
-                                <div>
-                                    <p class="text-[10px] font-bold uppercase opacity-60 tracking-widest mb-2">ระยะเวลา</p>
-                                    <p class="text-5xl font-black">${duration}<span class="ml-2 text-base font-normal opacity-80">วัน</span></p>
-                                </div>
+
+                            <div class="md:w-40 flex flex-col items-center justify-center bg-blue-600 rounded-[2rem] p-6 text-white shadow-lg shadow-blue-100">
+                                <p class="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">ระยะเวลา</p>
+                                <div class="text-4xl font-black">${days}</div>
+                                <p class="text-[10px] font-bold uppercase opacity-70">วัน</p>
                             </div>
                         </div>
                     </div>
@@ -486,160 +482,54 @@
                 container.appendChild(card);
             });
 
-            updateSummary();
+            // Update Summaries
+            const netDuration = (firstStart && lastEnd) ? calculateDays(firstStart, lastEnd) : 0;
+            document.getElementById('totalDaysHeader').innerText = netDuration;
+            document.getElementById('summaryTotalDays').innerText = netDuration;
+            document.getElementById('summaryStart').innerText = formatDateThai(firstStart);
+            document.getElementById('summaryEnd').innerText = formatDateThai(lastEnd);
+            document.getElementById('summaryOrigin').innerText = project.processes.length > 0 ? (project.processes[0].origin || "ไม่ระบุ") : "ไม่ระบุ";
+            document.getElementById('summaryDestination').innerText = project.processes.length > 0 ? (project.processes[project.processes.length - 1].destination || "ไม่ระบุ") : "ไม่ระบุ";
+
             lucide.createIcons();
-        }
-
-        function syncStatusMirror(val) {
-            const mirror = document.getElementById('projectStatus-mirror');
-            if (mirror) {
-                mirror.innerText = val;
-                const styles = {
-                    'Done': 'bg-green-50 text-green-700 border-green-100',
-                    'Kick off': 'bg-slate-50 text-slate-700 border-slate-100',
-                    'In Progress': 'bg-blue-50 text-blue-700 border-blue-100'
-                };
-                mirror.className = `pdf-mirror text-xs font-bold px-3 py-1.5 rounded-lg border ${styles[val] || styles['Kick off']}`;
-            }
-        }
-
-        function updateSummary() {
-            const project = projects.find(p => p.id === activeProjectId);
-            const display = document.getElementById('totalDurationDisplay');
-            const summaryDays = document.getElementById('summaryTotalDays');
-
-            if (project.processes.length === 0) {
-                if(display) display.innerText = '0';
-                if(summaryDays) summaryDays.innerText = '0';
-                document.getElementById('summaryStart').innerText = '-';
-                document.getElementById('summaryEnd').innerText = '-';
-                return;
-            }
-
-            const starts = project.processes.map(p => new Date(p.start).getTime()).filter(t => !isNaN(t));
-            const ends = project.processes.map(p => new Date(p.end).getTime()).filter(t => !isNaN(t));
-
-            if (starts.length > 0 && ends.length > 0) {
-                const minS = new Date(Math.min(...starts));
-                const maxE = new Date(Math.max(...ends));
-                const total = calculateDays(minS, maxE);
-
-                if(display) display.innerText = total;
-                if(summaryDays) summaryDays.innerText = total;
-                document.getElementById('summaryStart').innerText = formatDateThai(minS);
-                document.getElementById('summaryEnd').innerText = formatDateThai(maxE);
-                document.getElementById('summaryOrigin').innerText = project.processes[0].origin || "ไม่ระบุ";
-                document.getElementById('summaryDestination').innerText = project.processes[project.processes.length-1].destination || "ไม่ระบุ";
-            }
         }
 
         async function downloadPDF() {
             const project = projects.find(p => p.id === activeProjectId);
-            document.getElementById('reportDate').innerText = new Date().toLocaleDateString('th-TH');
-            document.getElementById('loadingOverlay').classList.replace('hidden', 'flex');
             document.body.classList.add('is-generating-pdf');
-
+            
             const opt = {
-                margin: 10,
-                filename: `${project.name}${project.area ? '-' + project.area : ''}.pdf`,
-                image: { type: 'jpeg', quality: 1.0 },
-                html2canvas: { scale: 3, useCORS: true, letterRendering: true },
+                margin: 5,
+                filename: `Logistics_${project.name}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             try {
-                await new Promise(r => setTimeout(r, 400));
-                await html2pdf().set(opt).from(document.getElementById('main-content')).save();
+                const element = document.getElementById('main-content');
+                await html2pdf().set(opt).from(element).save();
             } finally {
                 document.body.classList.remove('is-generating-pdf');
-                document.getElementById('loadingOverlay').classList.replace('flex', 'hidden');
             }
         }
 
-        // Gemini API Integration
-        async function askAI(type) {
+        function shareProject() {
             const project = projects.find(p => p.id === activeProjectId);
-            if (!project || project.processes.length === 0) {
-                alert("กรุณาเพิ่มขั้นตอนการขนส่งก่อนใช้งาน AI");
-                return;
-            }
-
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const loadingText = document.getElementById('loadingText');
-            loadingText.innerText = type === 'insights' ? "AI กำลังวิเคราะห์ข้อมูล..." : "AI กำลังร่างอีเมล...";
-            loadingOverlay.classList.replace('hidden', 'flex');
-
-            const processSummary = project.processes.map(p => `- ${p.name}: ${p.origin} -> ${p.destination} (${formatDateThai(p.start)} ถึง ${formatDateThai(p.end)}, รวม ${calculateDays(p.start, p.end)} วัน)`).join('\n');
+            const total = document.getElementById('summaryTotalDays').innerText;
+            const text = `โครงการ: ${project.name}\nพื้นที่: ${project.area}\nสถานะ: ${project.status}\nระยะเวลา: ${total} วัน\nสร้างโดย Logistic Tracker Pro`;
             
-            let systemPrompt = "";
-            let userQuery = "";
-
-            if (type === 'insights') {
-                systemPrompt = "คุณคือผู้เชี่ยวชาญด้านโลจิสติกส์ระหว่างประเทศ (โดยเฉพาะไทย-จีน) ให้วิเคราะห์แผนการขนส่งที่ได้รับ วิเคราะห์ความเสี่ยง แนะนำข้อควรระวัง และสรุปภาพรวมแผนงานในรูปแบบที่เข้าใจง่ายและเป็นมืออาชีพ";
-                userQuery = `โปรเจกต์: ${project.name}\nพื้นที่: ${project.area}\nผู้ให้บริการ: ${project.serviceProvider}\nสถานะ: ${project.status}\nขั้นตอนทั้งหมด:\n${processSummary}\n\nกรุณาสรุปและวิเคราะห์ความเสี่ยงในรูปแบบ HTML สั้นๆ (ใช้ h3, p, ul, li)`;
+            if (navigator.share) {
+                navigator.share({ title: project.name, text: text }).catch(() => {});
             } else {
-                systemPrompt = "คุณคือเลขาฝ่ายโลจิสติกส์มืออาชีพ หน้าที่ของคุณคือร่างอีเมลแจ้งสถานะการขนส่งสินค้าให้ลูกค้าหรือผู้บริหาร โดยใช้ข้อมูลจากแผนงานที่กำหนด ให้ใช้โทนที่เป็นทางการและสุภาพ";
-                userQuery = `โปรเจกต์: ${project.name}\nสถานะปัจจุบัน: ${project.status}\nกำหนดการรวม: ${document.getElementById('summaryTotalDays').innerText} วัน\nขั้นตอนสรุป:\n${processSummary}\n\nกรุณาร่างอีเมลเป็นภาษาไทยในรูปแบบ HTML (ใช้ h3 สำหรับหัวข้ออีเมล และ p สำหรับเนื้อหา)`;
+                const el = document.createElement('textarea');
+                el.value = text;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                alert("คัดลอกสรุปสถานะลงในคลิปบอร์ดแล้ว");
             }
-
-            const result = await callGemini(userQuery, systemPrompt);
-            loadingOverlay.classList.replace('flex', 'hidden');
-
-            if (result) {
-                document.getElementById('aiModalTitle').innerText = type === 'insights' ? "✨ AI Insights & Risk Analysis" : "✨ AI Drafted Status Email";
-                document.getElementById('aiModalContent').innerHTML = result;
-                document.getElementById('aiModal').classList.replace('hidden', 'flex');
-                lucide.createIcons();
-            }
-        }
-
-        async function callGemini(query, systemPrompt) {
-            let retries = 0;
-            const maxRetries = 5;
-
-            while (retries <= maxRetries) {
-                try {
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: query }] }],
-                            systemInstruction: { parts: [{ text: systemPrompt }] }
-                        })
-                    });
-
-                    if (!response.ok) throw new Error('API Error');
-                    const data = await response.json();
-                    return data.candidates?.[0]?.content?.parts?.[0]?.text;
-                } catch (e) {
-                    if (retries === maxRetries) {
-                        alert("ขออภัย ระบบ AI ไม่สามารถประมวลผลได้ในขณะนี้ กรุณาลองใหม่ภายหลัง");
-                        return null;
-                    }
-                    const wait = Math.pow(2, retries) * 1000;
-                    await new Promise(r => setTimeout(r, wait));
-                    retries++;
-                }
-            }
-        }
-
-        function closeAIModal() {
-            document.getElementById('aiModal').classList.replace('flex', 'hidden');
-        }
-
-        function copyAIConsent() {
-            const content = document.getElementById('aiModalContent').innerText;
-            const textarea = document.createElement('textarea');
-            textarea.value = content;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            
-            const btn = event.target;
-            const originalText = btn.innerText;
-            btn.innerText = "คัดลอกแล้ว!";
-            setTimeout(() => btn.innerText = originalText, 2000);
         }
 
         window.onload = render;
