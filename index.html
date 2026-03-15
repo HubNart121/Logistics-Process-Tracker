@@ -64,10 +64,10 @@
             <div class="bg-blue-600 p-2 rounded-lg text-white">
                 <i data-lucide="truck" class="w-5 h-5"></i>
             </div>
-            <span class="font-bold text-lg tracking-tight">LT Pro</span>
+            <span class="font-bold text-xl tracking-tight">LT Pro</span>
         </div>
         <button onclick="toggleSidebar()" class="p-2 hover:bg-slate-100 rounded-xl">
-            <i data-lucide="menu" class="w-6 h-6"></i>
+            <i data-lucide="menu" class="w-7 h-7"></i>
         </button>
     </header>
 
@@ -78,7 +78,7 @@
                 <div class="bg-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-200 text-white">
                     <i data-lucide="layout-grid" class="w-5 h-5"></i>
                 </div>
-                <h2 class="font-extrabold text-slate-900 tracking-tight">LT TRACKER</h2>
+                <h2 class="text-lg font-extrabold text-slate-900 tracking-tight uppercase">LT Tracker</h2>
             </div>
             <button onclick="addProject()" class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors" title="สร้างโปรเจกต์ใหม่">
                 <i data-lucide="plus" class="w-5 h-5"></i>
@@ -91,8 +91,8 @@
 
         <div class="p-4 bg-slate-50 border-t border-slate-100">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">แอปพลิเคชันจัดการโลจิสติกส์</p>
-                <p class="text-[10px] text-slate-300">V 2.0 (No AI Mode)</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">แอปพลิเคชันจัดการโลจิสติกส์</p>
+                <p class="text-[10px] text-slate-300 font-medium">VERSION 2.1 (Large Text Mode)</p>
             </div>
         </div>
     </aside>
@@ -105,49 +105,49 @@
         <div id="main-content" class="max-w-5xl mx-auto p-4 sm:p-8 pb-24">
             
             <!-- Header Card -->
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-6 md:p-8 mb-8 relative overflow-hidden">
+            <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-6 md:p-10 mb-8 relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-blue-50/50 rounded-full -mr-32 -mt-32 blur-3xl no-print"></div>
                 
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
-                    <div class="flex-1 space-y-4">
+                    <div class="flex-1 space-y-5">
                         <div class="flex items-center gap-3 no-print">
-                            <span class="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-widest rounded-full border border-blue-100">Project Workspace</span>
+                            <span class="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-widest rounded-full border border-blue-100">Workspace</span>
                             <div class="flex gap-2">
                                 <button onclick="downloadPDF()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-400" title="พิมพ์รายงาน PDF">
-                                    <i data-lucide="printer" class="w-4 h-4"></i>
+                                    <i data-lucide="printer" class="w-5 h-5"></i>
                                 </button>
                                 <button onclick="shareProject()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-400" title="แชร์ข้อความสถานะ">
-                                    <i data-lucide="share-2" class="w-4 h-4"></i>
+                                    <i data-lucide="share-2" class="w-5 h-5"></i>
                                 </button>
                             </div>
                         </div>
 
-                        <div class="space-y-1">
+                        <div class="space-y-2">
                             <input type="text" id="projectName" oninput="updateProject('name', this.value)" 
-                                   class="text-3xl font-black text-slate-900 bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
+                                   class="text-4xl font-black text-slate-900 bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
                                    placeholder="ชื่อโปรเจกต์...">
-                            <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-                                <div class="flex items-center gap-2 text-slate-500">
-                                    <span class="text-xs font-bold text-slate-300 uppercase">Area</span>
+                            <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+                                <div class="flex items-center gap-3 text-slate-500">
+                                    <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Area:</span>
                                     <input type="text" id="projectArea" oninput="updateProject('area', this.value)" 
-                                           class="text-sm font-semibold bg-transparent border-none focus:outline-none w-32 p-0" 
-                                           placeholder="ระบุรหัสพื้นที่...">
+                                           class="text-lg font-semibold bg-transparent border-none focus:outline-none w-36 p-0" 
+                                           placeholder="รหัสพื้นที่...">
                                 </div>
-                                <div class="w-px h-4 bg-slate-200 hidden sm:block"></div>
-                                <div class="flex items-center gap-2 text-slate-500">
-                                    <span class="text-xs font-bold text-slate-300 uppercase">Provider</span>
+                                <div class="w-px h-5 bg-slate-200 hidden sm:block"></div>
+                                <div class="flex items-center gap-3 text-slate-500">
+                                    <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Provider:</span>
                                     <input type="text" id="serviceProvider" oninput="updateProject('serviceProvider', this.value)" 
-                                           class="text-sm font-semibold bg-transparent border-none focus:outline-none w-48 p-0" 
+                                           class="text-lg font-semibold bg-transparent border-none focus:outline-none w-56 p-0" 
                                            placeholder="ชื่อผู้ให้บริการ...">
                                 </div>
                             </div>
                         </div>
 
                         <div class="flex flex-wrap gap-3 pt-2 no-print">
-                            <div class="flex items-center gap-2 px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-100">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status:</span>
+                            <div class="flex items-center gap-3 px-5 py-3 bg-slate-50 rounded-2xl border border-slate-100">
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Status:</span>
                                 <select id="projectStatus" onchange="updateProject('status', this.value)" 
-                                        class="bg-transparent text-slate-700 font-bold text-xs outline-none cursor-pointer">
+                                        class="bg-transparent text-slate-700 font-bold text-sm outline-none cursor-pointer">
                                     <option value="Kick off">Kick off</option>
                                     <option value="In Progress">In Progress</option>
                                     <option value="Done">Done</option>
@@ -157,57 +157,57 @@
                         </div>
                     </div>
 
-                    <div class="bg-blue-600 px-8 py-6 rounded-[2rem] text-white flex flex-col items-center justify-center shadow-2xl shadow-blue-200 min-w-[160px]">
-                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80 mb-1">เวลารวม</p>
+                    <div class="bg-blue-600 px-10 py-8 rounded-[2rem] text-white flex flex-col items-center justify-center shadow-2xl shadow-blue-200 min-w-[180px]">
+                        <p class="text-xs font-bold uppercase tracking-[0.2em] opacity-80 mb-2">เวลารวม</p>
                         <div class="flex items-baseline gap-1">
-                            <span id="totalDaysHeader" class="text-5xl font-black">0</span>
-                            <span class="text-sm font-bold opacity-80">วัน</span>
+                            <span id="totalDaysHeader" class="text-6xl font-black">0</span>
+                            <span class="text-lg font-bold opacity-80">วัน</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Process Container -->
-            <div id="processContainer" class="space-y-6">
+            <div id="processContainer" class="space-y-8">
                 <!-- Rows injected by JS -->
             </div>
 
             <!-- Add Button -->
-            <button onclick="addProcess()" class="no-print w-full mt-10 py-8 border-2 border-dashed border-slate-200 rounded-[2.5rem] text-slate-400 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50/50 transition-all flex flex-col items-center gap-2">
-                <i data-lucide="plus-circle" class="w-10 h-10"></i>
-                <span class="font-bold">เพิ่มขั้นตอนการทำงาน</span>
+            <button onclick="addProcess()" class="no-print w-full mt-12 py-10 border-2 border-dashed border-slate-200 rounded-[2.5rem] text-slate-400 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50/50 transition-all flex flex-col items-center gap-3">
+                <i data-lucide="plus-circle" class="w-12 h-12"></i>
+                <span class="text-lg font-bold">เพิ่มขั้นตอนการทำงานใหม่</span>
             </button>
 
-            <!-- Summary Card (Dark Theme as in image) -->
-            <div id="summaryCard" class="mt-12 bg-slate-900 rounded-[2.5rem] p-8 sm:p-10 text-white shadow-2xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-                <h3 class="text-xl font-bold mb-10 flex items-center gap-3 relative z-10">
-                    <i data-lucide="calendar-check" class="text-blue-400 w-6 h-6"></i>
+            <!-- Summary Card -->
+            <div id="summaryCard" class="mt-16 bg-slate-900 rounded-[2.5rem] p-10 md:p-14 text-white shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full -mr-24 -mt-24 blur-3xl"></div>
+                <h3 class="text-2xl font-bold mb-12 flex items-center gap-4 relative z-10">
+                    <i data-lucide="calendar-check" class="text-blue-400 w-8 h-8"></i>
                     ระยะเวลาโครงการรวม
                 </h3>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-12 items-center relative z-10 text-center">
-                    <div class="space-y-2">
-                        <p class="text-blue-400 text-[10px] font-bold uppercase tracking-widest">จุดเริ่มงาน</p>
-                        <p id="summaryStart" class="text-3xl font-bold">--/--/----</p>
-                        <p id="summaryOrigin" class="text-slate-500 text-sm font-medium truncate">ไม่ระบุต้นทาง</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-14 items-center relative z-10 text-center">
+                    <div class="space-y-3">
+                        <p class="text-blue-400 text-xs font-bold uppercase tracking-widest">จุดเริ่มงาน</p>
+                        <p id="summaryStart" class="text-4xl font-bold tracking-tight">--/--/----</p>
+                        <p id="summaryOrigin" class="text-slate-400 text-base font-medium truncate px-4">ไม่ระบุต้นทาง</p>
                     </div>
                     
                     <div class="flex flex-col items-center justify-center">
-                        <div class="text-[10px] text-slate-600 uppercase font-bold mb-3 tracking-widest">ระยะเวลาสุทธิ</div>
+                        <div class="text-xs text-slate-600 uppercase font-bold mb-4 tracking-widest">ระยะเวลาสุทธิ</div>
                         <div class="flex items-center w-full relative">
                             <div class="h-px bg-slate-800 flex-1"></div>
-                            <div class="bg-blue-600 px-6 py-2.5 rounded-full text-lg font-black mx-4 shadow-lg shadow-blue-600/20">
+                            <div class="bg-blue-600 px-8 py-3.5 rounded-full text-2xl font-black mx-4 shadow-lg shadow-blue-600/20">
                                 <span id="summaryTotalDays">0</span> วัน
                             </div>
                             <div class="h-px bg-slate-800 flex-1"></div>
                         </div>
                     </div>
 
-                    <div class="space-y-2">
-                        <p class="text-blue-400 text-[10px] font-bold uppercase tracking-widest">จุดสิ้นสุด</p>
-                        <p id="summaryEnd" class="text-3xl font-bold">--/--/----</p>
-                        <p id="summaryDestination" class="text-slate-500 text-sm font-medium truncate">ไม่ระบุปลายทาง</p>
+                    <div class="space-y-3">
+                        <p class="text-blue-400 text-xs font-bold uppercase tracking-widest">จุดสิ้นสุด</p>
+                        <p id="summaryEnd" class="text-4xl font-bold tracking-tight">--/--/----</p>
+                        <p id="summaryDestination" class="text-slate-400 text-base font-medium truncate px-4">ไม่ระบุปลายทาง</p>
                     </div>
                 </div>
             </div>
@@ -218,14 +218,14 @@
     <div id="customDialog" class="fixed inset-0 z-[120] hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
         <div class="relative bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl text-center">
-            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+            <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5">
+                <i data-lucide="alert-triangle" class="w-10 h-10"></i>
             </div>
-            <h3 id="dialogTitle" class="text-xl font-black mb-2">ยืนยันการลบ?</h3>
-            <p id="dialogMessage" class="text-slate-500 text-sm mb-8">ข้อมูลจะถูกลบถาวร ไม่สามารถย้อนกลับได้</p>
-            <div class="flex gap-3">
-                <button id="dialogCancel" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200">ยกเลิก</button>
-                <button id="dialogConfirm" class="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 shadow-lg shadow-red-100">ยืนยันลบ</button>
+            <h3 id="dialogTitle" class="text-2xl font-black mb-3 text-slate-900">ยืนยันการลบ?</h3>
+            <p id="dialogMessage" class="text-slate-500 text-base mb-8 px-4">ข้อมูลจะถูกลบถาวร ไม่สามารถย้อนกลับได้</p>
+            <div class="flex gap-4">
+                <button id="dialogCancel" class="flex-1 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 text-lg transition-colors">ยกเลิก</button>
+                <button id="dialogConfirm" class="flex-1 py-4 bg-red-500 text-white font-bold rounded-2xl hover:bg-red-600 shadow-lg shadow-red-100 text-lg transition-colors">ยืนยันลบ</button>
             </div>
         </div>
     </div>
@@ -356,7 +356,12 @@
             if (proc) {
                 proc[field] = value;
                 save();
-                if (field === 'start' || field === 'end' || field === 'origin' || field === 'destination') render();
+                
+                if (field === 'start' || field === 'end') {
+                    render();
+                } else {
+                    updateSummaryData();
+                }
             }
         }
 
@@ -377,15 +382,15 @@
             projects.forEach(p => {
                 const isActive = p.id === activeProjectId;
                 const div = document.createElement('div');
-                div.className = `group flex items-center justify-between p-4 rounded-[1.25rem] cursor-pointer transition-all mb-2 ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' : 'hover:bg-slate-50 text-slate-500'}`;
+                div.className = `group flex items-center justify-between p-5 rounded-[1.25rem] cursor-pointer transition-all mb-3 ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' : 'hover:bg-slate-50 text-slate-500'}`;
                 div.onclick = () => { activeProjectId = p.id; render(); if (window.innerWidth < 768) toggleSidebar(); };
                 div.innerHTML = `
-                    <div class="flex items-center gap-3 overflow-hidden">
-                        <i data-lucide="file-text" class="w-4 h-4 shrink-0 opacity-70"></i>
-                        <span class="text-sm font-bold truncate">${p.name || 'Untitled'}</span>
+                    <div class="flex items-center gap-4 overflow-hidden">
+                        <i data-lucide="file-text" class="w-5 h-5 shrink-0 opacity-70"></i>
+                        <span class="text-base font-bold truncate">${p.name || 'Untitled'}</span>
                     </div>
-                    <button onclick="deleteProject(${p.id}, event)" class="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-white/20 rounded-lg transition-all">
-                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    <button onclick="deleteProject(${p.id}, event)" class="opacity-0 group-hover:opacity-100 p-2 hover:bg-white/20 rounded-lg transition-all">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
                 `;
                 list.appendChild(div);
@@ -406,14 +411,79 @@
             const container = document.getElementById('processContainer');
             container.innerHTML = '';
 
+            project.processes.forEach((p, index) => {
+                const days = calculateDays(p.start, p.end);
+
+                const card = document.createElement('div');
+                card.className = 'process-card relative group';
+                card.innerHTML = `
+                    <div class="connector-line no-print"></div>
+                    <div class="relative z-10 bg-white rounded-[2.5rem] border border-slate-100 p-8 md:p-10 hover:shadow-2xl hover:shadow-slate-200/50 transition-all">
+                        <div class="flex flex-col md:flex-row gap-10">
+                            <div class="flex-1 space-y-7">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <p class="text-xs font-black text-blue-600 uppercase tracking-widest mb-2">Step 0${index + 1}</p>
+                                        <input type="text" value="${p.name}" oninput="updateProcess(${p.id}, 'name', this.value)" 
+                                               class="text-2xl font-bold bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
+                                               placeholder="ชื่อขั้นตอนการทำงาน...">
+                                    </div>
+                                    <button onclick="removeProcess(${p.id})" class="no-print p-2.5 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all">
+                                        <i data-lucide="trash-2" class="w-6 h-6"></i>
+                                    </button>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div class="bg-slate-50 p-5 rounded-2xl flex items-center gap-5 border border-slate-100/50">
+                                        <div class="bg-white p-3 rounded-xl text-slate-400 shadow-sm"><i data-lucide="arrow-up-right" class="w-5 h-5"></i></div>
+                                        <div class="flex-1">
+                                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">ต้นทาง</label>
+                                            <input type="text" value="${p.origin}" oninput="updateProcess(${p.id}, 'origin', this.value)" class="w-full bg-transparent font-bold text-slate-700 outline-none text-base" placeholder="ระบุต้นทาง">
+                                        </div>
+                                    </div>
+                                    <div class="bg-blue-50/50 p-5 rounded-2xl flex items-center gap-5 border border-blue-50">
+                                        <div class="bg-blue-600 p-3 rounded-xl text-white shadow-lg shadow-blue-100"><i data-lucide="map-pin" class="w-5 h-5"></i></div>
+                                        <div class="flex-1">
+                                            <label class="text-xs font-bold text-blue-400 uppercase tracking-wider block mb-1">ปลายทาง</label>
+                                            <input type="text" value="${p.destination}" oninput="updateProcess(${p.id}, 'destination', this.value)" class="w-full bg-transparent font-bold text-blue-700 outline-none text-base" placeholder="ระบุปลายทาง">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-6 pt-2">
+                                    <div>
+                                        <label class="text-xs font-bold text-slate-400 uppercase mb-3 block ml-2 tracking-wider">วันที่เริ่ม</label>
+                                        <input type="date" value="${p.start}" onchange="updateProcess(${p.id}, 'start', this.value)" class="w-full bg-white border border-slate-100 p-4 rounded-xl font-bold text-slate-600 text-base outline-none focus:ring-4 ring-blue-50 transition-all">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-bold text-slate-400 uppercase mb-3 block ml-2 tracking-wider">วันที่สิ้นสุด</label>
+                                        <input type="date" value="${p.end}" onchange="updateProcess(${p.id}, 'end', this.value)" class="w-full bg-white border border-slate-100 p-4 rounded-xl font-bold text-slate-600 text-base outline-none focus:ring-4 ring-blue-50 transition-all">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="md:w-48 flex flex-col items-center justify-center bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-100">
+                                <p class="text-xs font-bold uppercase tracking-widest mb-2 opacity-70">ระยะเวลา</p>
+                                <div class="text-5xl font-black mb-1">${days}</div>
+                                <p class="text-xs font-bold uppercase opacity-70">วัน</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            updateSummaryData();
+            lucide.createIcons();
+        }
+
+        function updateSummaryData() {
+            const project = projects.find(p => p.id === activeProjectId);
             let total = 0;
             let firstStart = null;
             let lastEnd = null;
 
-            project.processes.forEach((p, index) => {
-                const days = calculateDays(p.start, p.end);
-                total += days;
-
+            project.processes.forEach((p) => {
                 if (p.start) {
                     const sd = new Date(p.start);
                     if (!firstStart || sd < firstStart) firstStart = sd;
@@ -422,76 +492,16 @@
                     const ed = new Date(p.end);
                     if (!lastEnd || ed > lastEnd) lastEnd = ed;
                 }
-
-                const card = document.createElement('div');
-                card.className = 'process-card relative group';
-                card.innerHTML = `
-                    <div class="connector-line no-print"></div>
-                    <div class="relative z-10 bg-white rounded-[2.5rem] border border-slate-100 p-6 md:p-8 hover:shadow-xl hover:shadow-slate-200/50 transition-all">
-                        <div class="flex flex-col md:flex-row gap-8">
-                            <div class="flex-1 space-y-6">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex-1">
-                                        <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">Step 0${index + 1}</p>
-                                        <input type="text" value="${p.name}" oninput="updateProcess(${p.id}, 'name', this.value)" 
-                                               class="text-xl font-bold bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
-                                               placeholder="ชื่อขั้นตอนการทำงาน...">
-                                    </div>
-                                    <button onclick="removeProcess(${p.id})" class="no-print p-2 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
-                                        <i data-lucide="trash-2" class="w-5 h-5"></i>
-                                    </button>
-                                </div>
-
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div class="bg-slate-50 p-4 rounded-2xl flex items-center gap-4">
-                                        <div class="bg-white p-2.5 rounded-xl text-slate-400 shadow-sm"><i data-lucide="arrow-up-right" class="w-4 h-4"></i></div>
-                                        <div class="flex-1">
-                                            <label class="text-[10px] font-bold text-slate-400 uppercase">ต้นทาง</label>
-                                            <input type="text" value="${p.origin}" oninput="updateProcess(${p.id}, 'origin', this.value)" class="w-full bg-transparent font-bold text-slate-700 outline-none text-sm" placeholder="ระบุต้นทาง">
-                                        </div>
-                                    </div>
-                                    <div class="bg-blue-50/50 p-4 rounded-2xl flex items-center gap-4 border border-blue-50">
-                                        <div class="bg-blue-600 p-2.5 rounded-xl text-white shadow-lg shadow-blue-100"><i data-lucide="map-pin" class="w-4 h-4"></i></div>
-                                        <div class="flex-1">
-                                            <label class="text-[10px] font-bold text-blue-400 uppercase">ปลายทาง</label>
-                                            <input type="text" value="${p.destination}" oninput="updateProcess(${p.id}, 'destination', this.value)" class="w-full bg-transparent font-bold text-blue-700 outline-none text-sm" placeholder="ระบุปลายทาง">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-4 pt-2">
-                                    <div>
-                                        <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 block ml-2">วันที่เริ่ม</label>
-                                        <input type="date" value="${p.start}" onchange="updateProcess(${p.id}, 'start', this.value)" class="w-full bg-white border border-slate-100 p-3 rounded-xl font-bold text-slate-600 text-sm outline-none focus:ring-2 ring-blue-50">
-                                    </div>
-                                    <div>
-                                        <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 block ml-2">วันที่สิ้นสุด</label>
-                                        <input type="date" value="${p.end}" onchange="updateProcess(${p.id}, 'end', this.value)" class="w-full bg-white border border-slate-100 p-3 rounded-xl font-bold text-slate-600 text-sm outline-none focus:ring-2 ring-blue-50">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="md:w-40 flex flex-col items-center justify-center bg-blue-600 rounded-[2rem] p-6 text-white shadow-lg shadow-blue-100">
-                                <p class="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70">ระยะเวลา</p>
-                                <div class="text-4xl font-black">${days}</div>
-                                <p class="text-[10px] font-bold uppercase opacity-70">วัน</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
             });
 
-            // Update Summaries
             const netDuration = (firstStart && lastEnd) ? calculateDays(firstStart, lastEnd) : 0;
+            
             document.getElementById('totalDaysHeader').innerText = netDuration;
             document.getElementById('summaryTotalDays').innerText = netDuration;
             document.getElementById('summaryStart').innerText = formatDateThai(firstStart);
             document.getElementById('summaryEnd').innerText = formatDateThai(lastEnd);
             document.getElementById('summaryOrigin').innerText = project.processes.length > 0 ? (project.processes[0].origin || "ไม่ระบุ") : "ไม่ระบุ";
             document.getElementById('summaryDestination').innerText = project.processes.length > 0 ? (project.processes[project.processes.length - 1].destination || "ไม่ระบุ") : "ไม่ระบุ";
-
-            lucide.createIcons();
         }
 
         async function downloadPDF() {
