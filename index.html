@@ -77,9 +77,9 @@
         .is-generating-pdf .duration-box {
             background-color: var(--primary) !important;
             color: white !important;
-            border-radius: 1rem !important;
-            padding: 0.75rem !important;
-            min-width: 100px !important;
+            border-radius: 1.5rem !important;
+            padding: 1.5rem !important;
+            min-width: 140px !important;
             text-align: center !important;
             display: block !important;
         }
@@ -89,7 +89,6 @@
             margin-top: 1rem !important;
         }
 
-        /* แก้ปัญหา Link ยาวเกินบรรทัดใน PDF */
         .is-generating-pdf .pdf-link-container {
             word-break: break-all !important;
             overflow-wrap: anywhere !important;
@@ -134,7 +133,7 @@
         <div class="p-4 bg-slate-50 border-t border-slate-100">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 text-[10px]">ระบบจัดการโลจิสติกส์</p>
-                <p class="text-[9px] text-slate-300 font-medium tracking-tight uppercase">V 2.5 (Link Wrap Fix)</p>
+                <p class="text-[9px] text-slate-300 font-medium tracking-tight uppercase">V 2.6 (Layout Optimized)</p>
             </div>
         </div>
     </aside>
@@ -189,7 +188,7 @@
                             </div>
                         </div>
 
-                        <div class="flex flex-wrap gap-3 pt-2">
+                        <div class="flex flex-wrap items-center gap-6 pt-2">
                             <div class="flex items-center gap-3 px-5 py-3 bg-slate-50 rounded-2xl border border-slate-100">
                                 <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Status:</span>
                                 <select id="projectStatus" onchange="updateProject('status', this.value)" 
@@ -201,14 +200,22 @@
                                 </select>
                                 <span id="projectStatus-mirror" class="pdf-mirror text-sm font-bold text-blue-600"></span>
                             </div>
+                            <!-- Header Link Added based on screenshot -->
+                            <div class="flex items-center gap-2 no-print">
+                                <span class="text-xs font-bold text-red-500 uppercase tracking-widest">Link:</span>
+                                <input type="text" id="projectGlobalLink" oninput="updateProject('globalLink', this.value)" 
+                                       class="bg-transparent border-b border-dashed border-red-200 text-red-600 font-bold text-sm focus:outline-none placeholder:text-red-200" 
+                                       placeholder="Add link...">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="bg-blue-600 px-10 py-8 rounded-[2rem] text-white flex flex-col items-center justify-center shadow-2xl shadow-blue-200 min-w-[150px]">
+                    <!-- Header Total Days Box - Adjusted Font Size -->
+                    <div class="bg-blue-600 px-8 py-10 rounded-[2.5rem] text-white flex flex-col items-center justify-center shadow-2xl shadow-blue-200 min-w-[180px]">
                         <p class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80 mb-2">ระยะเวลารวม</p>
-                        <div class="flex items-baseline gap-1">
-                            <span id="totalDaysHeader" class="text-5xl font-black">0</span>
-                            <span class="text-lg font-bold opacity-80">วัน</span>
+                        <div class="flex items-baseline gap-2">
+                            <span id="totalDaysHeader" class="text-7xl font-black leading-none">0</span>
+                            <span class="text-xl font-bold opacity-80">วัน</span>
                         </div>
                     </div>
                 </div>
@@ -295,6 +302,7 @@
                 area: "BKK-01",
                 serviceProvider: "Lazada Express",
                 status: "In Progress",
+                globalLink: "",
                 processes: [
                     { id: 101, name: "ส่งสินค้าไปยังโกดัง Yiwu", origin: "Supplier A", destination: "โกดัง Yiwu", start: "2026-03-08", end: "2026-03-16", link: "", cost: 500 },
                     { id: 102, name: "ส่งสินค้าจากจีนมายังโกดังไทย", origin: "โกดัง Yiwu", destination: "โกดังไทย", start: "2026-03-18", end: "2026-03-27", link: "", cost: 2500 }
@@ -346,6 +354,7 @@
                 area: "",
                 serviceProvider: "",
                 status: "Kick off",
+                globalLink: "",
                 processes: []
             });
             activeProjectId = newId;
@@ -467,6 +476,7 @@
             document.getElementById('projectArea').value = project.area;
             document.getElementById('serviceProvider').value = project.serviceProvider;
             document.getElementById('projectStatus').value = project.status;
+            document.getElementById('projectGlobalLink').value = project.globalLink || "";
 
             const container = document.getElementById('processContainer');
             container.innerHTML = '';
@@ -516,7 +526,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Updated Row: Link & Cost with Green Color -->
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div class="flex flex-col gap-2">
                                         <label class="text-[10px] font-bold text-green-600 uppercase tracking-widest ml-2 no-print">Link :</label>
@@ -559,11 +568,12 @@
                                 </div>
                             </div>
 
-                            <div class="duration-box md:w-48 flex flex-col items-center justify-center bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-100">
-                                <p class="text-xs font-bold uppercase mb-2 opacity-70 no-print">ระยะเวลา</p>
-                                <p class="pdf-mirror text-[10px] font-bold mb-1">ระยะเวลา</p>
-                                <div class="text-5xl font-black mb-1">${days}</div>
-                                <p class="text-xs font-bold uppercase opacity-70">วัน</p>
+                            <!-- Duration Box - Increased Font Size as in image -->
+                            <div class="duration-box md:w-56 flex flex-col items-center justify-center bg-blue-600 rounded-[3rem] p-10 text-white shadow-xl shadow-blue-100 transition-all">
+                                <p class="text-sm font-bold uppercase mb-2 opacity-70 no-print">ระยะเวลา</p>
+                                <p class="pdf-mirror text-[12px] font-bold mb-1">ระยะเวลา</p>
+                                <div class="text-7xl font-black mb-1 leading-none">${days}</div>
+                                <p class="text-sm font-bold uppercase opacity-70">วัน</p>
                             </div>
                         </div>
                     </div>
