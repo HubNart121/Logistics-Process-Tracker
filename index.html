@@ -43,7 +43,7 @@
         }
         .process-card:last-child .connector-line::before { display: none; }
 
-        /* PDF Styles - ปรับปรุงเพื่อความกระชับและไม่แยกหน้าพร่ำเพรื่อ */
+        /* PDF Styles */
         .pdf-mirror { display: none; }
 
         .is-generating-pdf .no-print { display: none !important; }
@@ -57,7 +57,6 @@
             text-transform: none !important;
         }
 
-        /* ลด padding และ margin ในโหมด PDF เพื่อประหยัดพื้นที่ */
         .is-generating-pdf #main-content { padding: 5mm !important; }
         
         .is-generating-pdf .process-card,
@@ -65,8 +64,8 @@
         .is-generating-pdf header { 
             page-break-inside: avoid !important; 
             break-inside: avoid !important;
-            margin-bottom: 0.75rem !important; /* ลดระยะห่างระหว่างการ์ด */
-            padding: 1.5rem !important; /* ลด padding ภายในการ์ด */
+            margin-bottom: 0.75rem !important;
+            padding: 1.5rem !important;
             border-radius: 1.5rem !important;
             box-shadow: none !important;
             border: 1px solid #e2e8f0 !important;
@@ -89,8 +88,6 @@
             padding: 2rem !important;
             margin-top: 1rem !important;
         }
-
-        .is-generating-pdf #summaryCard h3 { margin-bottom: 1.5rem !important; }
     </style>
 </head>
 <body class="bg-[#F8FAFC] text-slate-900 min-h-screen flex flex-col md:flex-row overflow-x-hidden">
@@ -129,7 +126,7 @@
         <div class="p-4 bg-slate-50 border-t border-slate-100">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 text-[10px]">ระบบจัดการโลจิสติกส์</p>
-                <p class="text-[9px] text-slate-300 font-medium tracking-tight">V 2.3 (Compact PDF Mode)</p>
+                <p class="text-[9px] text-slate-300 font-medium tracking-tight uppercase">V 2.5 (Link & Cost Support)</p>
             </div>
         </div>
     </aside>
@@ -223,10 +220,19 @@
             <!-- Summary Card -->
             <div id="summaryCard" class="mt-12 bg-slate-900 rounded-[2.5rem] p-10 md:p-14 text-white shadow-2xl relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full -mr-24 -mt-24 blur-3xl no-print"></div>
-                <h3 class="text-2xl font-bold mb-10 flex items-center gap-4 relative z-10">
-                    <i data-lucide="calendar-check" class="text-blue-400 w-8 h-8 no-print"></i>
-                    ระยะเวลาโครงการรวม
-                </h3>
+                
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 relative z-10">
+                    <h3 class="text-2xl font-bold flex items-center gap-4">
+                        <i data-lucide="calendar-check" class="text-blue-400 w-8 h-8 no-print"></i>
+                        ระยะเวลาโครงการรวม
+                    </h3>
+                    <div class="bg-blue-600/20 border border-blue-500/30 px-6 py-3 rounded-2xl flex items-center gap-3">
+                        <i data-lucide="banknote" class="text-blue-400 w-5 h-5"></i>
+                        <span class="text-xs font-bold uppercase tracking-widest text-blue-300">ค่าใช้จ่ายรวม:</span>
+                        <span id="summaryTotalCost" class="text-xl font-black text-white">0.00</span>
+                        <span class="text-xs font-bold text-blue-300">บาท</span>
+                    </div>
+                </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-10 items-center relative z-10 text-center">
                     <div class="space-y-3">
@@ -263,11 +269,11 @@
             <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5">
                 <i data-lucide="alert-triangle" class="w-10 h-10"></i>
             </div>
-            <h3 id="dialogTitle" class="text-2xl font-black mb-3 text-slate-900 text-transform-none">ยืนยันการลบ?</h3>
-            <p id="dialogMessage" class="text-slate-500 text-base mb-8 px-4 text-transform-none">ข้อมูลจะถูกลบถาวร ไม่สามารถย้อนกลับได้</p>
+            <h3 id="dialogTitle" class="text-2xl font-black mb-3 text-slate-900">ยืนยันการลบ?</h3>
+            <p id="dialogMessage" class="text-slate-500 text-base mb-8 px-4">ข้อมูลจะถูกลบถาวร ไม่สามารถย้อนกลับได้</p>
             <div class="flex gap-4">
                 <button id="dialogCancel" class="flex-1 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 text-lg transition-colors">ยกเลิก</button>
-                <button id="dialogConfirm" class="flex-1 py-4 bg-red-500 text-white font-bold rounded-2xl hover:bg-red-600 shadow-lg shadow-red-100 text-lg transition-colors text-transform-none">ยืนยันลบ</button>
+                <button id="dialogConfirm" class="flex-1 py-4 bg-red-500 text-white font-bold rounded-2xl hover:bg-red-600 shadow-lg shadow-red-100 text-lg transition-colors">ยืนยันลบ</button>
             </div>
         </div>
     </div>
@@ -282,8 +288,8 @@
                 serviceProvider: "Lazada Express",
                 status: "In Progress",
                 processes: [
-                    { id: 101, name: "ส่งสินค้าไปยังโกดัง Yiwu", origin: "Supplier A", destination: "โกดัง Yiwu", start: "2026-03-08", end: "2026-03-16" },
-                    { id: 102, name: "ส่งสินค้าจากจีนมายังโกดังไทย", origin: "โกดัง Yiwu", destination: "โกดังไทย", start: "2026-03-18", end: "2026-03-27" }
+                    { id: 101, name: "ส่งสินค้าไปยังโกดัง Yiwu", origin: "Supplier A", destination: "โกดัง Yiwu", start: "2026-03-08", end: "2026-03-16", link: "", cost: 500 },
+                    { id: 102, name: "ส่งสินค้าจากจีนมายังโกดังไทย", origin: "โกดัง Yiwu", destination: "โกดังไทย", start: "2026-03-18", end: "2026-03-27", link: "", cost: 2500 }
                 ]
             }
         ];
@@ -387,7 +393,9 @@
                 origin: last ? last.destination : "",
                 destination: "",
                 start: last ? last.end : "",
-                end: ""
+                end: "",
+                link: "",
+                cost: 0
             });
             save();
             render();
@@ -397,6 +405,7 @@
             const project = projects.find(p => p.id === activeProjectId);
             const proc = project.processes.find(p => p.id === id);
             if (proc) {
+                if (field === 'cost') value = parseFloat(value) || 0;
                 proc[field] = value;
                 save();
                 
@@ -499,6 +508,33 @@
                                     </div>
                                 </div>
 
+                                <!-- New Row: Link & Cost -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div class="flex flex-col gap-2">
+                                        <label class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-2 no-print">Link :</label>
+                                        <p class="pdf-mirror text-[10px] font-bold text-red-500 ml-2">Link :</p>
+                                        <div class="flex items-center gap-2">
+                                            <input type="url" value="${p.link || ''}" oninput="updateProcess(${p.id}, 'link', this.value)" 
+                                                class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl font-medium text-slate-600 text-sm outline-none focus:ring-2 ring-blue-50"
+                                                placeholder="https://...">
+                                            ${p.link ? `<a href="${p.link}" target="_blank" class="no-print p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100"><i data-lucide="external-link" class="w-4 h-4"></i></a>` : ''}
+                                        </div>
+                                        <span class="pdf-mirror ml-2 text-sm">
+                                            ${p.link ? `<a href="${p.link}" class="text-blue-600 underline">${p.link}</a>` : '-'}
+                                        </span>
+                                    </div>
+                                    <div class="flex flex-col gap-2">
+                                        <label class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-2 no-print">ค่าใช้จ่าย :</label>
+                                        <p class="pdf-mirror text-[10px] font-bold text-red-500 ml-2">ค่าใช้จ่าย :</p>
+                                        <div class="relative">
+                                            <input type="number" value="${p.cost || 0}" oninput="updateProcess(${p.id}, 'cost', this.value)" 
+                                                class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl font-bold text-slate-700 text-sm outline-none focus:ring-2 ring-blue-50 pr-12 text-right">
+                                            <span class="absolute right-4 top-3 text-xs font-bold text-slate-400 no-print">บาท</span>
+                                        </div>
+                                        <span class="pdf-mirror ml-2 text-base font-bold text-slate-800">${(p.cost || 0).toLocaleString()} บาท</span>
+                                    </div>
+                                </div>
+
                                 <div class="grid grid-cols-2 gap-6 pt-2">
                                     <div class="flex flex-col">
                                         <label class="text-xs font-bold text-slate-400 uppercase mb-3 block ml-2 tracking-wider no-print">วันที่เริ่ม</label>
@@ -535,8 +571,10 @@
             const project = projects.find(p => p.id === activeProjectId);
             let firstStart = null;
             let lastEnd = null;
+            let totalCost = 0;
 
             project.processes.forEach((p) => {
+                totalCost += (p.cost || 0);
                 if (p.start) {
                     const sd = new Date(p.start);
                     if (!firstStart || sd < firstStart) firstStart = sd;
@@ -555,6 +593,7 @@
             document.getElementById('summaryEnd').innerText = formatDateThai(lastEnd);
             document.getElementById('summaryOrigin').innerText = project.processes.length > 0 ? (project.processes[0].origin || "ไม่ระบุ") : "ไม่ระบุ";
             document.getElementById('summaryDestination').innerText = project.processes.length > 0 ? (project.processes[project.processes.length - 1].destination || "ไม่ระบุ") : "ไม่ระบุ";
+            document.getElementById('summaryTotalCost').innerText = totalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
             document.getElementById('projectName-mirror').innerText = project.name;
             document.getElementById('projectArea-mirror').innerText = project.area;
@@ -567,17 +606,17 @@
             document.body.classList.add('is-generating-pdf');
             
             const opt = {
-                margin: [10, 10, 10, 10], // top, left, bottom, right (mm)
+                margin: [10, 10, 10, 10],
                 filename: `Logistics_${project.name}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
-                    scale: 1.5, // ลดสเกลลงเล็กน้อยเพื่อให้พอดีหน้า
+                    scale: 1.5,
                     useCORS: true,
                     letterRendering: true,
                     logging: false
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['css', 'legacy'] } // ใช้ CSS เป็นหลักในการควบคุมการขึ้นหน้าใหม่
+                pagebreak: { mode: ['css', 'legacy'] }
             };
 
             try {
@@ -592,7 +631,8 @@
         function shareProject() {
             const project = projects.find(p => p.id === activeProjectId);
             const total = document.getElementById('summaryTotalDays').innerText;
-            const text = `โครงการ: ${project.name}\nพื้นที่: ${project.area}\nสถานะ: ${project.status}\nระยะเวลา: ${total} วัน\nสร้างโดย Logistic Tracker Pro`;
+            const totalCost = document.getElementById('summaryTotalCost').innerText;
+            const text = `โครงการ: ${project.name}\nพื้นที่: ${project.area}\nสถานะ: ${project.status}\nระยะเวลา: ${total} วัน\nค่าใช้จ่ายรวม: ${totalCost} บาท\nสร้างโดย Logistic Tracker Pro`;
             
             if (navigator.share) {
                 navigator.share({ title: project.name, text: text }).catch(() => {});
