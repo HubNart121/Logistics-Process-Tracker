@@ -508,11 +508,11 @@
                                     </div>
                                 </div>
 
-                                <!-- New Row: Link & Cost -->
+                                <!-- Updated Row: Link & Cost with Green Color -->
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div class="flex flex-col gap-2">
-                                        <label class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-2 no-print">Link :</label>
-                                        <p class="pdf-mirror text-[10px] font-bold text-red-500 ml-2">Link :</p>
+                                        <label class="text-[10px] font-bold text-green-600 uppercase tracking-widest ml-2 no-print">Link :</label>
+                                        <p class="pdf-mirror text-[10px] font-bold text-green-600 ml-2">Link :</p>
                                         <div class="flex items-center gap-2">
                                             <input type="url" value="${p.link || ''}" oninput="updateProcess(${p.id}, 'link', this.value)" 
                                                 class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl font-medium text-slate-600 text-sm outline-none focus:ring-2 ring-blue-50"
@@ -524,8 +524,8 @@
                                         </span>
                                     </div>
                                     <div class="flex flex-col gap-2">
-                                        <label class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-2 no-print">ค่าใช้จ่าย :</label>
-                                        <p class="pdf-mirror text-[10px] font-bold text-red-500 ml-2">ค่าใช้จ่าย :</p>
+                                        <label class="text-[10px] font-bold text-green-600 uppercase tracking-widest ml-2 no-print">ค่าใช้จ่าย :</label>
+                                        <p class="pdf-mirror text-[10px] font-bold text-green-600 ml-2">ค่าใช้จ่าย :</p>
                                         <div class="relative">
                                             <input type="number" value="${p.cost || 0}" oninput="updateProcess(${p.id}, 'cost', this.value)" 
                                                 class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl font-bold text-slate-700 text-sm outline-none focus:ring-2 ring-blue-50 pr-12 text-right">
