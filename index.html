@@ -9,24 +9,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap');
+        
         :root {
             --primary: #2563eb;
             --primary-dark: #1e40af;
-            --primary-light: #3b82f6;
-            --accent: #06b6d4;
         }
-        * { box-sizing: border-box; }
+
         body { 
             font-family: 'Sarabun', sans-serif; 
             -webkit-tap-highlight-color: transparent;
-            background: linear-gradient(135deg, #f0f9ff 0%, #f0fdf4 100%);
         }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #cbd5e1, #e2e8f0); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #94a3b8, #cbd5e1); }
-        .process-card { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
-        .process-card:hover { transform: translateY(-4px); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+        .process-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
         @media (min-width: 768px) {
             .connector-line::before {
                 content: '';
@@ -34,99 +36,29 @@
                 left: 2rem;
                 top: 5rem;
                 bottom: -2rem;
-                width: 3px;
-                background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 50%, transparent 100%);
+                width: 2px;
+                background: repeating-linear-gradient(to bottom, #e2e8f0 0, #e2e8f0 10px, transparent 10px, transparent 20px);
                 z-index: 0;
             }
         }
         .process-card:last-child .connector-line::before { display: none; }
-        .card-gradient {
-            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,249,255,0.5) 100%);
-            backdrop-filter: blur(20px);
-        }
-        .summary-gradient {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        }
-        .shadow-soft {
-            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.08);
-        }
-        .shadow-card {
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06);
-        }
-        button { position: relative; overflow: hidden; }
-        button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.5s, height 0.5s;
-        }
-        button:active::before {
-            width: 300px;
-            height: 300px;
-        }
-        input:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 0 20px rgba(59, 130, 246, 0.2);
-        }
-        .badge {
-            animation: slideIn 0.4s ease-out;
-        }
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-        .duration-box {
-            position: relative;
-            overflow: hidden;
-        }
-        .duration-box::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: pulse 3s ease-in-out infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(0.8); opacity: 0; }
-            50% { transform: scale(1); opacity: 1; }
-        }
-        @keyframes slideProgress {
-            from { width: 0%; }
-            to { width: 100%; }
-        }
-        .progress-line {
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
-            animation: slideProgress 2s ease-in-out infinite;
-        }
+
+        /* PDF Styles */
         .pdf-mirror { display: none; }
+
         .is-generating-pdf .no-print { display: none !important; }
         .is-generating-pdf input, 
         .is-generating-pdf select { display: none !important; }
         .is-generating-pdf .pdf-mirror { display: inline-block !important; }
+        
         .is-generating-pdf * {
             letter-spacing: normal !important;
             line-height: 1.2 !important;
             text-transform: none !important;
         }
+
         .is-generating-pdf #main-content { padding: 5mm !important; }
+        
         .is-generating-pdf .process-card,
         .is-generating-pdf #summaryCard,
         .is-generating-pdf header { 
@@ -138,8 +70,10 @@
             box-shadow: none !important;
             border: 1px solid #e2e8f0 !important;
         }
+
         .is-generating-pdf body { background: white !important; }
         .is-generating-pdf main { height: auto !important; overflow: visible !important; }
+        
         .is-generating-pdf .duration-box {
             background-color: var(--primary) !important;
             color: white !important;
@@ -149,112 +83,114 @@
             text-align: center !important;
             display: block !important;
         }
+
         .is-generating-pdf #summaryCard {
             padding: 2rem !important;
             margin-top: 1rem !important;
         }
+
         .is-generating-pdf .pdf-link-container {
             word-break: break-all !important;
             overflow-wrap: anywhere !important;
             max-width: 100% !important;
             display: block !important;
         }
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .status-badge {
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .status-kickoff { background: #fef3c7; color: #b45309; }
-        .status-progress { background: #dbeafe; color: #1e40af; }
-        .status-done { background: #dcfce7; color: #166534; }
-        .status-delayed { background: #fee2e2; color: #991b1b; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 via-white to-green-50 text-slate-900 min-h-screen flex flex-col md:flex-row overflow-x-hidden">
-    <header class="md:hidden glass-effect sticky top-0 z-50 px-6 py-4 border-b border-slate-200/50 flex justify-between items-center no-print shadow-soft">
-        <div class="flex items-center gap-3">
-            <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-2.5 rounded-lg text-white shadow-lg shadow-blue-500/30">
+<body class="bg-[#F8FAFC] text-slate-900 min-h-screen flex flex-col md:flex-row overflow-x-hidden">
+
+    <!-- Mobile Header -->
+    <header class="md:hidden glass-effect sticky top-0 z-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center no-print">
+        <div class="flex items-center gap-2">
+            <div class="bg-blue-600 p-2 rounded-lg text-white">
                 <i data-lucide="truck" class="w-5 h-5"></i>
             </div>
-            <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">LT TRACKER</span>
+            <span class="font-bold text-xl tracking-tight text-blue-600">LT TRACKER</span>
         </div>
-        <button onclick="toggleSidebar()" class="p-2.5 hover:bg-slate-100 rounded-xl transition-all duration-200">
-            <i data-lucide="menu" class="w-6 h-6"></i>
+        <button onclick="toggleSidebar()" class="p-2 hover:bg-slate-100 rounded-xl">
+            <i data-lucide="menu" class="w-7 h-7"></i>
         </button>
     </header>
-    <aside id="sidebar" class="no-print fixed inset-y-0 left-0 z-[60] w-72 bg-white border-r border-slate-200/50 flex-shrink-0 flex flex-col transition-transform duration-300 -translate-x-full md:translate-x-0 md:relative shadow-lg">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="no-print fixed inset-y-0 left-0 z-[60] w-72 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col transition-transform duration-300 -translate-x-full md:translate-x-0 md:relative">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/30 text-white">
+                <div class="bg-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-200 text-white">
                     <i data-lucide="layout-grid" class="w-5 h-5"></i>
                 </div>
-                <h2 class="text-lg font-extrabold text-slate-900 tracking-tight">LT TRACKER</h2>
+                <h2 class="text-lg font-extrabold text-slate-900 tracking-tight uppercase">LT Tracker</h2>
             </div>
-            <button onclick="addProject()" class="p-2.5 bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 rounded-xl hover:from-blue-100 hover:to-blue-200 transition-all duration-200 shadow-soft" title="สร้างโปรเจกต์ใหม่">
+            <button onclick="addProject()" class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors" title="สร้างโปรเจกต์ใหม่">
                 <i data-lucide="plus" class="w-5 h-5"></i>
             </button>
         </div>
+        
         <div id="projectList" class="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+            <!-- Project items injected here -->
         </div>
-        <div class="p-4 bg-gradient-to-br from-slate-50 to-blue-50 border-t border-slate-100">
-            <div class="bg-white p-4 rounded-2xl border border-slate-200/50 shadow-soft text-center">
-                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">ระบบจัดการโลจิสติกส์</p>
-                <p class="text-[9px] text-slate-400 font-medium tracking-tight">V 3.0 (Enhanced UI)</p>
+
+        <div class="p-4 bg-slate-50 border-t border-slate-100">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 text-[10px]">ระบบจัดการโลจิสติกส์</p>
+                <p class="text-[9px] text-slate-300 font-medium tracking-tight uppercase">V 2.6 (Layout Optimized)</p>
             </div>
         </div>
     </aside>
-    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/40 z-[55] hidden backdrop-blur-md md:hidden"></div>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/40 z-[55] hidden backdrop-blur-sm md:hidden"></div>
+
+    <!-- Main Content -->
     <main class="flex-1 min-w-0 relative h-screen overflow-y-auto custom-scrollbar">
         <div id="main-content" class="max-w-5xl mx-auto p-4 sm:p-8 pb-24">
-            <div class="card-gradient rounded-3xl shadow-card border border-slate-200/50 p-6 md:p-10 mb-8 relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-300/20 to-cyan-300/20 rounded-full -mr-48 -mt-48 blur-3xl no-print"></div>
+            
+            <!-- Header Card -->
+            <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-6 md:p-10 mb-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-blue-50/50 rounded-full -mr-32 -mt-32 blur-3xl no-print"></div>
+                
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
                     <div class="flex-1 space-y-5">
                         <div class="flex items-center gap-3 no-print">
-                            <span class="badge px-4 py-2 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 text-xs font-bold uppercase tracking-widest rounded-full border border-blue-200/50 shadow-soft">Workspace</span>
+                            <span class="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-widest rounded-full border border-blue-100">Workspace</span>
                             <div class="flex gap-2">
-                                <button onclick="downloadPDF()" class="p-2.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-all duration-200" title="พิมพ์รายงาน PDF">
+                                <button onclick="downloadPDF()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-400" title="พิมพ์รายงาน PDF">
                                     <i data-lucide="printer" class="w-4 h-4"></i>
                                 </button>
-                                <button onclick="shareProject()" class="p-2.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-all duration-200" title="แชร์ข้อความสถานะ">
+                                <button onclick="shareProject()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-400" title="แชร์ข้อความสถานะ">
                                     <i data-lucide="share-2" class="w-4 h-4"></i>
                                 </button>
                             </div>
                         </div>
-                        <div class="space-y-3">
+
+                        <div class="space-y-2">
                             <input type="text" id="projectName" oninput="updateProject('name', this.value)" 
                                    class="text-4xl font-black text-slate-900 bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
                                    placeholder="ชื่อโปรเจกต์...">
                             <span id="projectName-mirror" class="pdf-mirror text-3xl font-black text-slate-900"></span>
-                            <div class="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2">
-                                <div class="flex items-center gap-3 text-slate-600">
-                                    <span class="text-sm font-bold text-slate-500 uppercase tracking-wider">Area:</span>
+                            
+                            <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+                                <div class="flex items-center gap-3 text-slate-500">
+                                    <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Area:</span>
                                     <input type="text" id="projectArea" oninput="updateProject('area', this.value)" 
-                                           class="text-lg font-semibold bg-transparent border-none focus:outline-none w-40 p-0 border-b border-transparent hover:border-blue-300" 
+                                           class="text-lg font-semibold bg-transparent border-none focus:outline-none w-36 p-0" 
                                            placeholder="รหัสพื้นที่...">
                                     <span id="projectArea-mirror" class="pdf-mirror text-base font-semibold text-slate-700"></span>
                                 </div>
-                                <div class="w-px h-6 bg-slate-300/30 hidden sm:block no-print"></div>
-                                <div class="flex items-center gap-3 text-slate-600">
-                                    <span class="text-sm font-bold text-slate-500 uppercase tracking-wider">Provider:</span>
+                                <div class="w-px h-5 bg-slate-200 hidden sm:block no-print"></div>
+                                <div class="flex items-center gap-3 text-slate-500">
+                                    <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Provider:</span>
                                     <input type="text" id="serviceProvider" oninput="updateProject('serviceProvider', this.value)" 
-                                           class="text-lg font-semibold bg-transparent border-none focus:outline-none w-56 p-0 border-b border-transparent hover:border-blue-300" 
+                                           class="text-lg font-semibold bg-transparent border-none focus:outline-none w-56 p-0" 
                                            placeholder="ชื่อผู้ให้บริการ...">
                                     <span id="serviceProvider-mirror" class="pdf-mirror text-base font-semibold text-slate-700"></span>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex flex-wrap items-center gap-6 pt-4">
-                            <div class="flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-slate-50 to-blue-50 rounded-2xl border border-slate-200/50 shadow-soft">
-                                <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Status:</span>
+
+                        <div class="flex flex-wrap items-center gap-6 pt-2">
+                            <div class="flex items-center gap-3 px-5 py-3 bg-slate-50 rounded-2xl border border-slate-100">
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Status:</span>
                                 <select id="projectStatus" onchange="updateProject('status', this.value)" 
                                         class="bg-transparent text-slate-700 font-bold text-sm outline-none cursor-pointer">
                                     <option value="Kick off">Kick off</option>
@@ -267,80 +203,97 @@
                             <div class="flex items-center gap-2 no-print">
                                 <span class="text-xs font-bold text-green-600 uppercase tracking-widest">Link:</span>
                                 <input type="text" id="projectGlobalLink" oninput="updateProject('globalLink', this.value)" 
-                                       class="bg-transparent border-b border-dashed border-green-300 text-green-600 font-semibold text-sm focus:outline-none placeholder:text-green-300 transition-all duration-200" 
+                                       class="bg-transparent border-b border-dashed border-green-200 text-green-600 font-bold text-sm focus:outline-none placeholder:text-green-200" 
                                        placeholder="Add link...">
                             </div>
                         </div>
                     </div>
-                    <div class="duration-box bg-gradient-to-br from-blue-500 to-blue-700 px-8 py-12 rounded-3xl text-white flex flex-col items-center justify-center shadow-card relative min-w-[200px]">
-                        <p class="text-lg font-bold uppercase tracking-[0.1em] opacity-90 mb-3 relative z-10">ระยะเวลารวม</p>
-                        <div class="flex items-baseline gap-2 relative z-10">
-                            <span id="totalDaysHeader" class="text-7xl font-black leading-none">0</span>
-                            <span class="text-3xl font-bold opacity-90">วัน</span>
+
+                    <!-- Increased Label and Unit font size for Balance (Header) -->
+                    <div class="bg-blue-600 px-10 py-14 rounded-[3rem] text-white flex flex-col items-center justify-center shadow-2xl shadow-blue-200 min-w-[220px]">
+                        <p class="text-xl font-bold uppercase tracking-[0.1em] opacity-90 mb-3">ระยะเวลารวม</p>
+                        <div class="flex items-baseline gap-2">
+                            <span id="totalDaysHeader" class="text-8xl font-black leading-none">0</span>
+                            <span class="text-4xl font-bold opacity-90">วัน</span>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Process Container -->
             <div id="processContainer" class="space-y-6">
+                <!-- Rows injected by JS -->
             </div>
-            <button onclick="addProcess()" class="no-print w-full mt-12 py-12 border-2 border-dashed border-slate-300 rounded-3xl text-slate-400 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50/50 transition-all duration-300 flex flex-col items-center gap-4 group">
-                <i data-lucide="plus-circle" class="w-12 h-12 group-hover:scale-110 transition-transform duration-300"></i>
+
+            <!-- Add Button -->
+            <button onclick="addProcess()" class="no-print w-full mt-12 py-10 border-2 border-dashed border-slate-200 rounded-[2.5rem] text-slate-400 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50/50 transition-all flex flex-col items-center gap-3">
+                <i data-lucide="plus-circle" class="w-12 h-12"></i>
                 <span class="text-lg font-bold">เพิ่มขั้นตอนการทำงานใหม่</span>
             </button>
-            <div id="summaryCard" class="summary-gradient rounded-3xl p-8 md:p-12 text-white shadow-card relative overflow-hidden mt-12">
-                <div class="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-full -mr-40 -mt-40 blur-3xl no-print"></div>
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 relative z-10">
-                    <h3 class="text-2xl font-bold flex items-center gap-3">
-                        <i data-lucide="calendar-check" class="text-cyan-400 w-8 h-8 no-print"></i>
+
+            <!-- Summary Card -->
+            <div id="summaryCard" class="mt-12 bg-slate-900 rounded-[2.5rem] p-10 md:p-14 text-white shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full -mr-24 -mt-24 blur-3xl no-print"></div>
+                
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 relative z-10">
+                    <h3 class="text-2xl font-bold flex items-center gap-4">
+                        <i data-lucide="calendar-check" class="text-blue-400 w-8 h-8 no-print"></i>
                         ระยะเวลาโครงการรวม
                     </h3>
-                    <div class="bg-gradient-to-r from-blue-600/30 to-cyan-600/30 border border-blue-400/40 px-6 py-3 rounded-2xl flex items-center gap-3 backdrop-blur-sm shadow-soft">
-                        <i data-lucide="banknote" class="text-cyan-300 w-5 h-5"></i>
-                        <span class="text-xs font-bold uppercase tracking-widest text-cyan-300">ค่าใช้จ่ายรวม:</span>
+                    <div class="bg-blue-600/20 border border-blue-500/30 px-6 py-3 rounded-2xl flex items-center gap-3">
+                        <i data-lucide="banknote" class="text-blue-400 w-5 h-5"></i>
+                        <span class="text-xs font-bold uppercase tracking-widest text-blue-300">ค่าใช้จ่ายรวม:</span>
                         <span id="summaryTotalCost" class="text-xl font-black text-white">0.00</span>
-                        <span class="text-xs font-bold text-cyan-300">บาท</span>
+                        <span class="text-xs font-bold text-blue-300">บาท</span>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 items-center relative z-10 text-center">
-                    <div class="space-y-4 bg-slate-800/40 backdrop-blur-sm p-6 rounded-2xl border border-slate-700/50">
-                        <p class="text-cyan-300 text-xs font-bold uppercase tracking-widest">จุดเริ่มงาน</p>
-                        <p id="summaryStart" class="text-4xl font-black tracking-tight">--/--/----</p>
-                        <p id="summaryOrigin" class="text-slate-400 text-sm font-medium truncate px-2">ไม่ระบุต้นทาง</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-10 items-center relative z-10 text-center">
+                    <div class="space-y-3">
+                        <p class="text-blue-400 text-xs font-bold uppercase tracking-widest">จุดเริ่มงาน</p>
+                        <p id="summaryStart" class="text-4xl font-bold tracking-tight">--/--/----</p>
+                        <p id="summaryOrigin" class="text-slate-400 text-base font-medium truncate px-4">ไม่ระบุต้นทาง</p>
                     </div>
-                    <div class="flex flex-col items-center justify-center py-6">
-                        <div class="text-xs text-slate-400 uppercase font-bold mb-4 tracking-widest">ระยะเวลาสุทธิ</div>
+                    
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="text-xs text-slate-600 uppercase font-bold mb-4 tracking-widest">ระยะเวลาสุทธิ</div>
                         <div class="flex items-center w-full relative">
-                            <div class="h-px bg-gradient-to-r from-transparent via-slate-600 to-transparent flex-1"></div>
-                            <div class="bg-gradient-to-r from-cyan-500 to-blue-500 px-8 py-4 rounded-full text-3xl font-black mx-4 shadow-lg shadow-cyan-500/30">
+                            <div class="h-px bg-slate-800 flex-1"></div>
+                            <div class="bg-blue-600 px-8 py-3.5 rounded-full text-2xl font-black mx-4 shadow-lg shadow-blue-600/20">
                                 <span id="summaryTotalDays">0</span> วัน
                             </div>
-                            <div class="h-px bg-gradient-to-r from-transparent via-slate-600 to-transparent flex-1"></div>
+                            <div class="h-px bg-slate-800 flex-1"></div>
                         </div>
                     </div>
-                    <div class="space-y-4 bg-slate-800/40 backdrop-blur-sm p-6 rounded-2xl border border-slate-700/50">
-                        <p class="text-cyan-300 text-xs font-bold uppercase tracking-widest">จุดสิ้นสุด</p>
-                        <p id="summaryEnd" class="text-4xl font-black tracking-tight">--/--/----</p>
-                        <p id="summaryDestination" class="text-slate-400 text-sm font-medium truncate px-2">ไม่ระบุปลายทาง</p>
+
+                    <div class="space-y-3">
+                        <p class="text-blue-400 text-xs font-bold uppercase tracking-widest">จุดสิ้นสุด</p>
+                        <p id="summaryEnd" class="text-4xl font-bold tracking-tight">--/--/----</p>
+                        <p id="summaryDestination" class="text-slate-400 text-base font-medium truncate px-4">ไม่ระบุปลายทาง</p>
                     </div>
                 </div>
             </div>
         </div>
     </main>
+
+    <!-- Custom Confirm Dialog -->
     <div id="customDialog" class="fixed inset-0 z-[120] hidden items-center justify-center p-4 no-print">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md"></div>
-        <div class="relative bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl text-center animate-in fade-in zoom-in duration-300">
-            <div class="w-20 h-20 bg-gradient-to-br from-red-100 to-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl text-center">
+            <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5">
                 <i data-lucide="alert-triangle" class="w-10 h-10"></i>
             </div>
             <h3 id="dialogTitle" class="text-2xl font-black mb-3 text-slate-900">ยืนยันการลบ?</h3>
             <p id="dialogMessage" class="text-slate-500 text-base mb-8 px-4">ข้อมูลจะถูกลบถาวร ไม่สามารถย้อนกลับได้</p>
             <div class="flex gap-4">
-                <button id="dialogCancel" class="flex-1 py-3 bg-slate-100 text-slate-700 font-bold rounded-2xl hover:bg-slate-200 text-lg transition-all duration-200">ยกเลิก</button>
-                <button id="dialogConfirm" class="flex-1 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-bold rounded-2xl hover:from-red-600 hover:to-red-700 shadow-lg shadow-red-500/30 text-lg transition-all duration-200">ยืนยันลบ</button>
+                <button id="dialogCancel" class="flex-1 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 text-lg transition-colors">ยกเลิก</button>
+                <button id="dialogConfirm" class="flex-1 py-4 bg-red-500 text-white font-bold rounded-2xl hover:bg-red-600 shadow-lg shadow-red-100 text-lg transition-colors">ยืนยันลบ</button>
             </div>
         </div>
     </div>
+
     <script>
+        // State Management
         let projects = JSON.parse(localStorage.getItem('lt_pro_simple_data')) || [
             {
                 id: Date.now(),
@@ -356,13 +309,17 @@
             }
         ];
         let activeProjectId = projects[0].id;
+
+        // Core Functions
         function save() {
             localStorage.setItem('lt_pro_simple_data', JSON.stringify(projects));
         }
+
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
             const isHidden = sidebar.classList.contains('-translate-x-full');
+            
             if (isHidden) {
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
@@ -371,6 +328,7 @@
                 overlay.classList.add('hidden');
             }
         }
+
         function calculateDays(start, end) {
             if (!start || !end) return 0;
             const s = new Date(start);
@@ -378,12 +336,15 @@
             const diff = Math.ceil((e - s) / (1000 * 60 * 60 * 24));
             return diff >= 0 ? diff : 0;
         }
+
         function formatDateThai(dateStr) {
             if (!dateStr) return "-";
             const date = new Date(dateStr);
             if (isNaN(date)) return "-";
             return date.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
         }
+
+        // Project Actions
         function addProject() {
             const newId = Date.now();
             projects.push({
@@ -400,6 +361,7 @@
             render();
             if (window.innerWidth < 768) toggleSidebar();
         }
+
         function updateProject(field, value) {
             const project = projects.find(p => p.id === activeProjectId);
             if (project) {
@@ -409,18 +371,22 @@
                 updateSummaryData();
             }
         }
+
         async function showConfirm(title, message) {
             return new Promise((resolve) => {
                 const modal = document.getElementById('customDialog');
                 document.getElementById('dialogTitle').innerText = title;
                 document.getElementById('dialogMessage').innerText = message;
                 modal.classList.replace('hidden', 'flex');
+                
                 const onCancel = () => { modal.classList.replace('flex', 'hidden'); resolve(false); };
                 const onConfirm = () => { modal.classList.replace('flex', 'hidden'); resolve(true); };
+                
                 document.getElementById('dialogCancel').onclick = onCancel;
                 document.getElementById('dialogConfirm').onclick = onConfirm;
             });
         }
+
         async function deleteProject(id, event) {
             event.stopPropagation();
             if (projects.length === 1) return;
@@ -432,6 +398,8 @@
                 render();
             }
         }
+
+        // Process Actions
         function addProcess() {
             const project = projects.find(p => p.id === activeProjectId);
             const last = project.processes[project.processes.length - 1];
@@ -448,6 +416,7 @@
             save();
             render();
         }
+
         function updateProcess(id, field, value) {
             const project = projects.find(p => p.id === activeProjectId);
             const proc = project.processes.find(p => p.id === id);
@@ -455,6 +424,7 @@
                 if (field === 'cost') value = parseFloat(value) || 0;
                 proc[field] = value;
                 save();
+                
                 if (field === 'start' || field === 'end') {
                     render();
                 } else {
@@ -462,6 +432,7 @@
                 }
             }
         }
+
         async function removeProcess(id) {
             const ok = await showConfirm("ลบขั้นตอน?", "คุณต้องการลบขั้นตอนนี้ใช่หรือไม่?");
             if (ok) {
@@ -471,20 +442,22 @@
                 render();
             }
         }
+
+        // Rendering
         function renderSidebar() {
             const list = document.getElementById('projectList');
             list.innerHTML = '';
             projects.forEach(p => {
                 const isActive = p.id === activeProjectId;
                 const div = document.createElement('div');
-                div.className = `group flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all duration-300 mb-2 ${isActive ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-500/30' : 'hover:bg-slate-50 text-slate-600 border border-transparent hover:border-slate-200'}`;
+                div.className = `group flex items-center justify-between p-5 rounded-[1.25rem] cursor-pointer transition-all mb-3 ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' : 'hover:bg-slate-50 text-slate-500'}`;
                 div.onclick = () => { activeProjectId = p.id; render(); if (window.innerWidth < 768) toggleSidebar(); };
                 div.innerHTML = `
-                    <div class="flex items-center gap-3 overflow-hidden">
+                    <div class="flex items-center gap-4 overflow-hidden">
                         <i data-lucide="file-text" class="w-5 h-5 shrink-0 opacity-70"></i>
                         <span class="text-base font-bold truncate">${p.name || 'Untitled'}</span>
                     </div>
-                    <button onclick="deleteProject(${p.id}, event)" class="opacity-0 group-hover:opacity-100 p-2 hover:bg-white/20 rounded-lg transition-all duration-200">
+                    <button onclick="deleteProject(${p.id}, event)" class="opacity-0 group-hover:opacity-100 p-2 hover:bg-white/20 rounded-lg transition-all">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
                 `;
@@ -492,117 +465,131 @@
             });
             lucide.createIcons();
         }
+
         function render() {
             renderSidebar();
             const project = projects.find(p => p.id === activeProjectId);
+            
+            // Header Info
             document.getElementById('projectName').value = project.name;
             document.getElementById('projectArea').value = project.area;
             document.getElementById('serviceProvider').value = project.serviceProvider;
             document.getElementById('projectStatus').value = project.status;
             document.getElementById('projectGlobalLink').value = project.globalLink || "";
+
             const container = document.getElementById('processContainer');
             container.innerHTML = '';
+
             project.processes.forEach((p, index) => {
                 const days = calculateDays(p.start, p.end);
+
                 const card = document.createElement('div');
                 card.className = 'process-card relative group';
                 card.innerHTML = `
                     <div class="connector-line no-print"></div>
-                    <div class="relative z-10 card-gradient rounded-3xl border border-slate-200/50 p-6 md:p-10 shadow-card">
+                    <div class="relative z-10 bg-white rounded-[2.5rem] border border-slate-100 p-8 md:p-10 hover:shadow-2xl hover:shadow-slate-200/50 transition-all">
                         <div class="flex flex-col md:flex-row gap-8 lg:gap-12">
                             <div class="flex-1 space-y-7">
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
-                                        <p class="text-xs font-black text-blue-600 uppercase tracking-widest mb-2 no-print">Step ${String(index + 1).padStart(2, '0')}</p>
-                                        <p class="pdf-mirror text-xs font-black text-blue-600 mb-1">ขั้นตอนที่ ${String(index + 1).padStart(2, '0')}</p>
+                                        <p class="text-xs font-black text-blue-600 uppercase tracking-widest mb-2 no-print">Step 0${index + 1}</p>
+                                        <p class="pdf-mirror text-xs font-black text-blue-600 mb-1">ขั้นตอนที่ 0${index + 1}</p>
                                         <input type="text" value="${p.name}" oninput="updateProcess(${p.id}, 'name', this.value)" 
                                                class="text-2xl font-bold bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
                                                placeholder="ชื่อขั้นตอนการทำงาน...">
                                         <span class="pdf-mirror text-2xl font-bold text-slate-900">${p.name || '-'}</span>
                                     </div>
-                                    <button onclick="removeProcess(${p.id})" class="no-print p-2.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all duration-200">
-                                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                    <button onclick="removeProcess(${p.id})" class="no-print p-2.5 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all">
+                                        <i data-lucide="trash-2" class="w-6 h-6"></i>
                                     </button>
                                 </div>
+
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <div class="bg-gradient-to-br from-slate-50 to-slate-100/50 p-5 rounded-2xl flex items-center gap-4 border border-slate-200/50 shadow-soft">
+                                    <div class="bg-slate-50 p-5 rounded-2xl flex items-center gap-5 border border-slate-100/50">
                                         <div class="bg-white p-3 rounded-xl text-slate-400 shadow-sm no-print"><i data-lucide="arrow-up-right" class="w-5 h-5"></i></div>
                                         <div class="flex-1">
-                                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1 no-print">ต้นทาง</label>
+                                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1 no-print">ต้นทาง</label>
                                             <p class="pdf-mirror text-[10px] font-bold text-slate-400 mb-1">ต้นทาง</p>
                                             <input type="text" value="${p.origin}" oninput="updateProcess(${p.id}, 'origin', this.value)" class="w-full bg-transparent font-bold text-slate-700 outline-none text-base" placeholder="ระบุต้นทาง">
                                             <span class="pdf-mirror font-bold text-slate-700 text-base">${p.origin || '-'}</span>
                                         </div>
                                     </div>
-                                    <div class="bg-gradient-to-br from-blue-50 to-cyan-50 p-5 rounded-2xl flex items-center gap-4 border border-blue-200/50 shadow-soft">
-                                        <div class="bg-gradient-to-br from-blue-500 to-cyan-500 p-3 rounded-xl text-white shadow-lg shadow-blue-500/30 no-print"><i data-lucide="map-pin" class="w-5 h-5"></i></div>
+                                    <div class="bg-blue-50/50 p-5 rounded-2xl flex items-center gap-5 border border-blue-50">
+                                        <div class="bg-blue-600 p-3 rounded-xl text-white shadow-lg shadow-blue-100 no-print"><i data-lucide="map-pin" class="w-5 h-5"></i></div>
                                         <div class="flex-1">
-                                            <label class="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-1 no-print">ปลายทาง</label>
-                                            <p class="pdf-mirror text-[10px] font-bold text-blue-600 mb-1">ปลายทาง</p>
+                                            <label class="text-xs font-bold text-blue-400 uppercase tracking-wider block mb-1 no-print">ปลายทาง</label>
+                                            <p class="pdf-mirror text-[10px] font-bold text-blue-400 mb-1">ปลายทาง</p>
                                             <input type="text" value="${p.destination}" oninput="updateProcess(${p.id}, 'destination', this.value)" class="w-full bg-transparent font-bold text-blue-700 outline-none text-base" placeholder="ระบุปลายทาง">
                                             <span class="pdf-mirror font-bold text-blue-700 text-base">${p.destination || '-'}</span>
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <div class="flex flex-col gap-3">
+                                    <div class="flex flex-col gap-2">
                                         <label class="text-[10px] font-bold text-green-600 uppercase tracking-widest ml-2 no-print">Link :</label>
                                         <p class="pdf-mirror text-[10px] font-bold text-green-600 ml-2">Link :</p>
                                         <div class="flex items-center gap-2">
                                             <input type="url" id="link-${p.id}" value="${p.link || ''}" oninput="updateProcess(${p.id}, 'link', this.value)" 
-                                                class="w-full bg-white border border-slate-200 p-3 rounded-xl font-medium text-slate-600 text-sm outline-none focus:ring-2 focus:ring-green-500/30 transition-all duration-200"
+                                                class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl font-medium text-slate-600 text-sm outline-none focus:ring-2 ring-blue-50"
                                                 placeholder="https://...">
-                                            ${p.link ? `<a href="${p.link}" target="_blank" class="no-print p-3 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-colors duration-200"><i data-lucide="external-link" class="w-4 h-4"></i></a>` : ''}
+                                            ${p.link ? `<a href="${p.link}" target="_blank" class="no-print p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100"><i data-lucide="external-link" class="w-4 h-4"></i></a>` : ''}
                                         </div>
                                         <div class="pdf-mirror ml-2 text-[11px] pdf-link-container">
-                                            ${p.link ? `<a href="${p.link}" class="text-green-600 underline">${p.link}</a>` : '-'}
+                                            ${p.link ? `<a href="${p.link}" class="text-blue-600 underline">${p.link}</a>` : '-'}
                                         </div>
                                     </div>
-                                    <div class="flex flex-col gap-3">
-                                        <label class="text-[10px] font-bold text-amber-600 uppercase tracking-widest ml-2 no-print">ค่าใช้จ่าย :</label>
-                                        <p class="pdf-mirror text-[10px] font-bold text-amber-600 ml-2">ค่าใช้จ่าย :</p>
+                                    <div class="flex flex-col gap-2">
+                                        <label class="text-[10px] font-bold text-green-600 uppercase tracking-widest ml-2 no-print">ค่าใช้จ่าย :</label>
+                                        <p class="pdf-mirror text-[10px] font-bold text-green-600 ml-2">ค่าใช้จ่าย :</p>
                                         <div class="relative">
                                             <input type="number" value="${p.cost || 0}" oninput="updateProcess(${p.id}, 'cost', this.value)" 
-                                                class="w-full bg-white border border-slate-200 p-3 rounded-xl font-bold text-slate-700 text-sm outline-none focus:ring-2 focus:ring-amber-500/30 pr-12 text-right transition-all duration-200">
+                                                class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl font-bold text-slate-700 text-sm outline-none focus:ring-2 ring-blue-50 pr-12 text-right">
                                             <span class="absolute right-4 top-3 text-xs font-bold text-slate-400 no-print">บาท</span>
                                         </div>
                                         <span class="pdf-mirror ml-2 text-base font-bold text-slate-800">${(p.cost || 0).toLocaleString()} บาท</span>
                                     </div>
                                 </div>
+
                                 <div class="grid grid-cols-2 gap-6 pt-2">
                                     <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-500 uppercase mb-3 block ml-2 tracking-wider no-print">วันที่เริ่ม</label>
+                                        <label class="text-xs font-bold text-slate-400 uppercase mb-3 block ml-2 tracking-wider no-print">วันที่เริ่ม</label>
                                         <p class="pdf-mirror text-[10px] font-bold text-slate-400 mb-1 ml-2">วันที่เริ่ม</p>
-                                        <input type="date" value="${p.start}" onchange="updateProcess(${p.id}, 'start', this.value)" class="w-full bg-white border border-slate-200 p-3 rounded-xl font-bold text-slate-600 text-base outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200">
+                                        <input type="date" value="${p.start}" onchange="updateProcess(${p.id}, 'start', this.value)" class="w-full bg-white border border-slate-100 p-4 rounded-xl font-bold text-slate-600 text-base outline-none focus:ring-4 ring-blue-50 transition-all">
                                         <span class="pdf-mirror font-bold text-slate-600 text-base ml-2">${formatDateThai(p.start)}</span>
                                     </div>
                                     <div class="flex flex-col">
-                                        <label class="text-xs font-bold text-slate-500 uppercase mb-3 block ml-2 tracking-wider no-print">วันที่สิ้นสุด</label>
+                                        <label class="text-xs font-bold text-slate-400 uppercase mb-3 block ml-2 tracking-wider no-print">วันที่สิ้นสุด</label>
                                         <p class="pdf-mirror text-[10px] font-bold text-slate-400 mb-1 ml-2">วันที่สิ้นสุด</p>
-                                        <input type="date" value="${p.end}" onchange="updateProcess(${p.id}, 'end', this.value)" class="w-full bg-white border border-slate-200 p-3 rounded-xl font-bold text-slate-600 text-base outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200">
+                                        <input type="date" value="${p.end}" onchange="updateProcess(${p.id}, 'end', this.value)" class="w-full bg-white border border-slate-100 p-4 rounded-xl font-bold text-slate-600 text-base outline-none focus:ring-4 ring-blue-50 transition-all">
                                         <span class="pdf-mirror font-bold text-slate-600 text-base ml-2">${formatDateThai(p.end)}</span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="duration-box md:w-64 flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl p-10 text-white shadow-card relative">
-                                <p class="text-lg font-bold uppercase mb-2 opacity-90 no-print relative z-10">ระยะเวลา</p>
+
+                            <!-- Duration Box - Balanced Font Sizes (text-8xl + text-4xl) -->
+                            <div class="duration-box md:w-64 flex flex-col items-center justify-center bg-blue-600 rounded-[3.5rem] p-12 text-white shadow-xl shadow-blue-100 transition-all">
+                                <p class="text-xl font-bold uppercase mb-2 opacity-90 no-print">ระยะเวลา</p>
                                 <p class="pdf-mirror text-base font-bold mb-1">ระยะเวลา</p>
-                                <div class="text-7xl font-black mb-1 leading-none relative z-10">${days}</div>
-                                <p class="text-3xl font-bold opacity-90 relative z-10">วัน</p>
+                                <div class="text-8xl font-black mb-1 leading-none">${days}</div>
+                                <p class="text-4xl font-bold uppercase opacity-90">วัน</p>
                             </div>
                         </div>
                     </div>
                 `;
                 container.appendChild(card);
             });
+
             updateSummaryData();
             lucide.createIcons();
         }
+
         function updateSummaryData() {
             const project = projects.find(p => p.id === activeProjectId);
             let firstStart = null;
             let lastEnd = null;
             let totalCost = 0;
+
             project.processes.forEach((p) => {
                 totalCost += (p.cost || 0);
                 if (p.start) {
@@ -614,7 +601,9 @@
                     if (!lastEnd || ed > lastEnd) lastEnd = ed;
                 }
             });
+
             const netDuration = (firstStart && lastEnd) ? calculateDays(firstStart, lastEnd) : 0;
+            
             document.getElementById('totalDaysHeader').innerText = netDuration;
             document.getElementById('summaryTotalDays').innerText = netDuration;
             document.getElementById('summaryStart').innerText = formatDateThai(firstStart);
@@ -622,14 +611,17 @@
             document.getElementById('summaryOrigin').innerText = project.processes.length > 0 ? (project.processes[0].origin || "ไม่ระบุ") : "ไม่ระบุ";
             document.getElementById('summaryDestination').innerText = project.processes.length > 0 ? (project.processes[project.processes.length - 1].destination || "ไม่ระบุ") : "ไม่ระบุ";
             document.getElementById('summaryTotalCost').innerText = totalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
             document.getElementById('projectName-mirror').innerText = project.name;
             document.getElementById('projectArea-mirror').innerText = project.area;
             document.getElementById('serviceProvider-mirror').innerText = project.serviceProvider;
             document.getElementById('projectStatus-mirror').innerText = project.status;
         }
+
         async function downloadPDF() {
             const project = projects.find(p => p.id === activeProjectId);
             document.body.classList.add('is-generating-pdf');
+            
             const opt = {
                 margin: [10, 10, 10, 10],
                 filename: `Logistics_${project.name}.pdf`,
@@ -643,6 +635,7 @@
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { mode: ['css', 'legacy'] }
             };
+
             try {
                 await new Promise(r => setTimeout(r, 400));
                 const element = document.getElementById('main-content');
@@ -651,11 +644,13 @@
                 document.body.classList.remove('is-generating-pdf');
             }
         }
+
         function shareProject() {
             const project = projects.find(p => p.id === activeProjectId);
             const total = document.getElementById('summaryTotalDays').innerText;
             const totalCost = document.getElementById('summaryTotalCost').innerText;
             const text = `โครงการ: ${project.name}\nพื้นที่: ${project.area}\nสถานะ: ${project.status}\nระยะเวลา: ${total} วัน\nค่าใช้จ่ายรวม: ${totalCost} บาท\nสร้างโดย Logistic Tracker Pro`;
+            
             if (navigator.share) {
                 navigator.share({ title: project.name, text: text }).catch(() => {});
             } else {
@@ -668,6 +663,7 @@
                 alert("คัดลอกสรุปสถานะลงในคลิปบอร์ดแล้ว");
             }
         }
+
         window.onload = render;
     </script>
 </body>
