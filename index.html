@@ -43,7 +43,7 @@
         }
         .process-card:last-child .connector-line::before { display: none; }
 
-        /* PDF Styles - ป้องกันตัวสะกดเพี้ยนและการซ้อนทับ */
+        /* PDF & Image Export Styles */
         .pdf-mirror { display: none; }
 
         .is-generating-pdf .no-print,
@@ -65,7 +65,6 @@
             font-family: 'Sarabun', sans-serif !important;
         }
         
-        /* บังคับค่าพื้นฐานเพื่อความนิ่งของตัวหนังสือใน PDF */
         .is-generating-pdf * {
             letter-spacing: 0 !important;
             line-height: 1.3 !important;
@@ -94,6 +93,13 @@
             padding: 1.5rem !important;
             min-width: 160px !important;
             text-align: center !important;
+            display: block !important;
+        }
+
+        .is-generating-pdf .pdf-link-container {
+            word-break: break-all !important;
+            overflow-wrap: anywhere !important;
+            max-width: 100% !important;
             display: block !important;
         }
     </style>
@@ -134,7 +140,7 @@
         <div class="p-4 bg-slate-50 border-t border-slate-100">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 text-[10px]">ระบบจัดการโลจิสติกส์</p>
-                <p class="text-[9px] text-slate-300 font-medium tracking-tight uppercase">V 2.7 (Report Final Fix)</p>
+                <p class="text-[9px] text-slate-300 font-medium tracking-tight uppercase">V 2.8 (Image Export Ready)</p>
             </div>
         </div>
     </aside>
@@ -156,7 +162,10 @@
                             <span class="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-widest rounded-full border border-blue-100">Workspace</span>
                             <div class="flex gap-2">
                                 <button onclick="downloadPDF()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-400" title="พิมพ์รายงาน PDF">
-                                    <i data-lucide="printer" class="w-4 h-4"></i>
+                                    <i data-lucide="printer" class="w-5 h-5"></i>
+                                </button>
+                                <button onclick="downloadImage()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-400" title="ดาวน์โหลดเป็นรูปภาพ">
+                                    <i data-lucide="image" class="w-5 h-5"></i>
                                 </button>
                                 <button onclick="shareProject()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-400" title="แชร์ข้อความสถานะ">
                                     <i data-lucide="share-2" class="w-4 h-4"></i>
@@ -212,7 +221,7 @@
 
                     <div class="bg-blue-600 px-10 py-14 rounded-[3rem] text-white flex flex-col items-center justify-center shadow-2xl shadow-blue-200 min-w-[220px]">
                         <p class="text-xl font-bold uppercase tracking-[0.1em] opacity-90 mb-3 no-print">ระยะเวลารวม</p>
-                        <p class="pdf-mirror text-sm font-bold mb-3 uppercase">ระยะเวลารวม</p>
+                        <p class="pdf-mirror text-base font-bold mb-3 uppercase">ระยะเวลารวม</p>
                         <div class="flex items-baseline gap-2">
                             <span id="totalDaysHeader" class="text-8xl font-black leading-none">0</span>
                             <span class="text-4xl font-bold opacity-90">วัน</span>
@@ -620,8 +629,6 @@
 
         async function downloadPDF() {
             const project = projects.find(p => p.id === activeProjectId);
-            
-            // Step 1: Prep UI
             document.body.classList.add('is-generating-pdf');
             window.scrollTo(0, 0);
 
@@ -633,19 +640,51 @@
                     scale: 2,
                     useCORS: true,
                     letterRendering: true,
-                    backgroundColor: '#ffffff',
-                    scrollX: 0,
-                    scrollY: 0
+                    backgroundColor: '#ffffff'
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { mode: ['css', 'legacy'] }
             };
 
             try {
-                // Wait for styles and DOM to settle
                 await new Promise(r => setTimeout(r, 600));
                 const element = document.getElementById('main-content');
                 await html2pdf().set(opt).from(element).save();
+            } finally {
+                document.body.classList.remove('is-generating-pdf');
+            }
+        }
+
+        // New Feature: Download as Image
+        async function downloadImage() {
+            const project = projects.find(p => p.id === activeProjectId);
+            document.body.classList.add('is-generating-pdf');
+            window.scrollTo(0, 0);
+
+            try {
+                // Wait for styles and mirrored content to settle
+                await new Promise(r => setTimeout(r, 600));
+                const element = document.getElementById('main-content');
+
+                // html2canvas is exposed by html2pdf bundle
+                const canvas = await html2canvas(element, {
+                    scale: 2, // High resolution
+                    useCORS: true,
+                    letterRendering: true,
+                    backgroundColor: '#ffffff',
+                    scrollX: 0,
+                    scrollY: 0,
+                    windowWidth: document.documentElement.offsetWidth,
+                    windowHeight: document.documentElement.offsetHeight
+                });
+
+                const link = document.createElement('a');
+                link.download = `Logistics_Report_${project.name}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 1.0);
+                link.click();
+            } catch (err) {
+                console.error(err);
+                alert("เกิดข้อผิดพลาดในการสร้างรูปภาพ กรุณาลองใหม่อีกครั้ง");
             } finally {
                 document.body.classList.remove('is-generating-pdf');
             }
