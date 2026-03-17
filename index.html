@@ -43,10 +43,9 @@
         }
         .process-card:last-child .connector-line::before { display: none; }
 
-        /* Styles for Screen View Controls */
+        /* PDF & Image Export Styles */
         .pdf-mirror { display: none; }
 
-        /* CRITICAL: Styles for Balanced Report Generation */
         .is-generating-pdf .no-print,
         .is-generating-pdf svg,
         .is-generating-pdf button { display: none !important; }
@@ -72,8 +71,8 @@
         }
 
         .is-generating-pdf #main-content { 
-            width: 850px !important; 
-            padding: 15mm !important; 
+            width: 800px !important; 
+            padding: 10mm !important; 
             background: white !important; 
             margin: 0 auto !important;
         }
@@ -83,43 +82,33 @@
         .is-generating-pdf header { 
             page-break-inside: avoid !important; 
             break-inside: avoid !important;
-            margin-bottom: 2rem !important;
+            margin-bottom: 1rem !important;
             border: 1px solid #e2e8f0 !important;
             background: white !important;
-            border-radius: 2rem !important;
+            border-radius: 1.5rem !important;
         }
 
-        /* Balance Summary Card in PDF */
-        .is-generating-pdf #summaryCard {
-            padding: 2.5rem !important;
-            display: block !important;
-            background-color: #ffffff !important;
-        }
-
+        /* Balance Summary in Report */
         .is-generating-pdf .summary-grid {
             display: flex !important;
+            flex-direction: row !important;
             justify-content: space-between !important;
             align-items: center !important;
-            text-align: center !important;
             width: 100% !important;
         }
 
         .is-generating-pdf .summary-col {
-            flex: 1 !important;
+            flex: 0 0 33.33% !important;
             width: 33.33% !important;
+            text-align: center !important;
         }
 
-        /* Fix Colors for Report to match App */
-        .is-generating-pdf #summaryCard h3 { color: #2563eb !important; font-size: 1.5rem !important; margin-bottom: 2rem !important; }
-        .is-generating-pdf .text-blue-400 { color: #2563eb !important; font-weight: bold !important; }
-        
-        /* Summary Total Days Circle in Report */
         .is-generating-pdf .total-days-circle {
             background-color: #2563eb !important;
             color: #ffffff !important;
-            width: 120px !important;
-            height: 120px !important;
-            border-radius: 50% !important;
+            width: 110px !important;
+            height: 110px !important;
+            border-radius: 100% !important;
             display: flex !important;
             flex-direction: column !important;
             justify-content: center !important;
@@ -127,68 +116,54 @@
             margin: 0 auto !important;
         }
 
-        /* Summary Total Cost Box in Report */
         .is-generating-pdf .cost-box-report {
             background-color: #f8fafc !important;
             border: 1px solid #e2e8f0 !important;
-            padding: 0.75rem 1.5rem !important;
+            padding: 8px 16px !important;
             border-radius: 1rem !important;
             display: inline-block !important;
-            margin-bottom: 1.5rem !important;
         }
-        .is-generating-pdf #summaryTotalCost { color: #1e293b !important; font-weight: 900 !important; }
 
-        /* Duration Box Balance */
         .is-generating-pdf .duration-box {
             background-color: #2563eb !important;
             color: white !important;
-            border-radius: 2.5rem !important;
-            padding: 2rem !important;
-            width: 220px !important;
-            min-width: 220px !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            justify-content: center !important;
+            border-radius: 2rem !important;
+            padding: 1.25rem !important;
+            width: 170px !important;
+            min-width: 170px !important;
+            text-align: center !important;
         }
         
-        .is-generating-pdf .duration-box .text-8xl {
-            font-size: 5rem !important;
-            color: white !important;
-            font-weight: 900 !important;
-        }
-        .is-generating-pdf .duration-box .text-4xl {
-            font-size: 1.5rem !important;
-            color: white !important;
-            font-weight: bold !important;
-        }
+        .is-generating-pdf .duration-box .text-8xl { font-size: 3.5rem !important; font-weight: 900 !important; }
+        .is-generating-pdf .duration-box .text-4xl { font-size: 1.1rem !important; font-weight: bold !important; }
 
         .is-generating-pdf .text-green-600 { color: #16a34a !important; font-weight: bold !important; }
         .is-generating-pdf .pdf-link-container {
             word-break: break-all !important;
             overflow-wrap: anywhere !important;
             color: #2563eb !important;
-            font-size: 0.75rem !important;
+            font-size: 0.7rem !important;
+            text-decoration: underline !important;
         }
     </style>
 </head>
 <body class="bg-[#F8FAFC] text-slate-900 min-h-screen flex flex-col md:flex-row overflow-x-hidden">
 
-    <!-- Mobile Header -->
-    <header class="md:hidden glass-effect sticky top-0 z-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center no-print">
+    <!-- Mobile Header - Fixed to prevent obscuring content -->
+    <header class="md:hidden bg-white/95 backdrop-blur-md fixed top-0 left-0 w-full z-[70] px-6 py-4 border-b border-slate-200 flex justify-between items-center no-print shadow-sm">
         <div class="flex items-center gap-2">
             <div class="bg-blue-600 p-2 rounded-lg text-white">
                 <i data-lucide="truck" class="w-5 h-5"></i>
             </div>
-            <span class="font-bold text-xl tracking-tight text-blue-600">LT TRACKER</span>
+            <span class="font-bold text-xl tracking-tight text-blue-600 uppercase">LT Tracker</span>
         </div>
         <button onclick="toggleSidebar()" class="p-2 hover:bg-slate-100 rounded-xl">
-            <i data-lucide="menu" class="w-7 h-7"></i>
+            <i data-lucide="menu" class="w-7 h-7 text-slate-700"></i>
         </button>
     </header>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="no-print fixed inset-y-0 left-0 z-[60] w-72 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col transition-transform duration-300 -translate-x-full md:translate-x-0 md:relative">
+    <aside id="sidebar" class="no-print fixed inset-y-0 left-0 z-[80] w-72 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col transition-transform duration-300 -translate-x-full md:translate-x-0 md:relative">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <div class="bg-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-200 text-white">
@@ -208,15 +183,15 @@
         <div class="p-4 bg-slate-50 border-t border-slate-100">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 text-[10px]">ระบบจัดการโลจิสติกส์</p>
-                <p class="text-[9px] text-slate-300 font-medium tracking-tight uppercase">V 3.1 (Balanced Export)</p>
+                <p class="text-[9px] text-slate-300 font-medium tracking-tight uppercase">V 3.2 (Mobile UI Fixed)</p>
             </div>
         </div>
     </aside>
 
-    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/40 z-[55] hidden backdrop-blur-sm md:hidden"></div>
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/40 z-[75] hidden backdrop-blur-sm md:hidden"></div>
 
-    <!-- Main Content -->
-    <main class="flex-1 min-w-0 relative h-screen overflow-y-auto custom-scrollbar">
+    <!-- Main Content - Added top padding for mobile header -->
+    <main class="flex-1 min-w-0 relative h-screen overflow-y-auto custom-scrollbar pt-[72px] md:pt-0">
         <div id="main-content" class="max-w-5xl mx-auto p-4 sm:p-8 pb-24">
             
             <!-- Header Card -->
@@ -242,7 +217,7 @@
 
                         <div class="space-y-2">
                             <input type="text" id="projectName" oninput="updateProject('name', this.value)" 
-                                   class="text-4xl font-black text-slate-900 bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
+                                   class="text-3xl sm:text-4xl font-black text-slate-900 bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
                                    placeholder="ชื่อโปรเจกต์...">
                             <span id="projectName-mirror" class="pdf-mirror text-3xl font-black text-slate-900"></span>
                             
@@ -290,8 +265,8 @@
                         <p class="text-xl font-extrabold uppercase tracking-[0.1em] opacity-90 mb-3 no-print">ระยะเวลารวม</p>
                         <p class="pdf-mirror text-base font-bold mb-3 uppercase text-center">ระยะเวลารวม</p>
                         <div class="flex items-baseline gap-2">
-                            <span id="totalDaysHeader" class="text-8xl font-black leading-none">0</span>
-                            <span class="text-4xl font-bold opacity-90">วัน</span>
+                            <span id="totalDaysHeader" class="text-7xl sm:text-8xl font-black leading-none">0</span>
+                            <span class="text-3xl sm:text-4xl font-bold opacity-90">วัน</span>
                         </div>
                     </div>
                 </div>
@@ -328,7 +303,7 @@
                 <div class="summary-grid grid grid-cols-1 sm:grid-cols-3 gap-10 items-center relative z-10 text-center">
                     <div class="summary-col space-y-3">
                         <p class="text-blue-400 text-xs font-bold uppercase tracking-widest">จุดเริ่มงาน</p>
-                        <p id="summaryStart" class="text-4xl font-bold tracking-tight">--/--/----</p>
+                        <p id="summaryStart" class="text-3xl sm:text-4xl font-bold tracking-tight">--/--/----</p>
                         <p id="summaryOrigin" class="text-slate-400 text-base font-medium truncate px-4">ไม่ระบุต้นทาง</p>
                     </div>
                     
@@ -346,7 +321,7 @@
 
                     <div class="summary-col space-y-3">
                         <p class="text-blue-400 text-xs font-bold uppercase tracking-widest">จุดสิ้นสุด</p>
-                        <p id="summaryEnd" class="text-4xl font-bold tracking-tight">--/--/----</p>
+                        <p id="summaryEnd" class="text-3xl sm:text-4xl font-bold tracking-tight">--/--/----</p>
                         <p id="summaryDestination" class="text-slate-400 text-base font-medium truncate px-4">ไม่ระบุปลายทาง</p>
                     </div>
                 </div>
@@ -375,11 +350,11 @@
         let projects = JSON.parse(localStorage.getItem('lt_pro_simple_data')) || [
             {
                 id: Date.now(),
-                name: "นำเข้าสินค้าจาก Yiwu มา ไทย",
-                area: "BKK-01",
-                serviceProvider: "Lazada Express",
+                name: "Import Order #CN-2026",
+                area: "GUANGZHOU-BKK",
+                serviceProvider: "Anan cargo",
                 status: "In Progress",
-                globalLink: "",
+                globalLink: "https://www.brt.co.th/",
                 processes: [
                     { id: 101, name: "ส่งสินค้าไปยังโกดัง Yiwu", origin: "Supplier A", destination: "โกดัง Yiwu", start: "2026-03-08", end: "2026-03-16", link: "", cost: 500 },
                     { id: 102, name: "ส่งสินค้าจากจีนมายังโกดังไทย", origin: "โกดัง Yiwu", destination: "โกดังไทย", start: "2026-03-18", end: "2026-03-27", link: "", cost: 2500 }
@@ -508,7 +483,7 @@
                                     <div class="flex-1">
                                         <p class="text-xs font-black text-blue-600 uppercase tracking-widest mb-2 no-print">Step 0${index + 1}</p>
                                         <p class="pdf-mirror text-xs font-black text-blue-600 mb-1 uppercase">ขั้นตอนที่ 0${index + 1}</p>
-                                        <input type="text" value="${p.name}" oninput="updateProcess(${p.id}, 'name', this.value)" class="text-2xl font-bold bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" placeholder="ชื่อขั้นตอนการทำงาน...">
+                                        <input type="text" value="${p.name}" oninput="updateProcess(${p.id}, 'name', this.value)" class="text-xl sm:text-2xl font-bold bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" placeholder="ชื่อขั้นตอนการทำงาน...">
                                         <span class="pdf-mirror text-2xl font-bold text-slate-900">${p.name || '-'}</span>
                                     </div>
                                     <button onclick="removeProcess(${p.id})" class="no-print p-2.5 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"><i data-lucide="trash-2" class="w-6 h-6"></i></button>
@@ -571,8 +546,8 @@
                             <div class="duration-box md:w-64 flex flex-col items-center justify-center bg-blue-600 rounded-[3.5rem] p-12 text-white shadow-xl shadow-blue-100 transition-all">
                                 <p class="text-xl font-extrabold uppercase mb-2 opacity-90 no-print text-center">ระยะเวลา</p>
                                 <p class="pdf-mirror text-base font-bold mb-1 text-center uppercase">ระยะเวลา</p>
-                                <div class="text-8xl font-black mb-1 leading-none text-center">${days}</div>
-                                <p class="text-4xl font-bold uppercase opacity-90 text-center">วัน</p>
+                                <div class="text-7xl sm:text-8xl font-black mb-1 leading-none text-center">${days}</div>
+                                <p class="text-3xl sm:text-4xl font-bold uppercase opacity-90 text-center">วัน</p>
                             </div>
                         </div>
                     </div>`;
@@ -612,7 +587,7 @@
                 html2canvas: { scale: 2, useCORS: true, letterRendering: true, backgroundColor: '#ffffff', width: 850 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['css', 'legacy'] }
             };
-            try { await new Promise(r => setTimeout(r, 1000)); const element = document.getElementById('main-content'); await html2pdf().set(opt).from(element).save(); }
+            try { await new Promise(r => setTimeout(r, 1200)); const element = document.getElementById('main-content'); await html2pdf().set(opt).from(element).save(); }
             finally { document.body.classList.remove('is-generating-pdf'); }
         }
 
@@ -621,7 +596,7 @@
             document.body.classList.add('is-generating-pdf');
             window.scrollTo(0, 0);
             try {
-                await new Promise(r => setTimeout(r, 1200));
+                await new Promise(r => setTimeout(r, 1500));
                 const element = document.getElementById('main-content');
                 const worker = html2pdf().from(element).set({
                     margin: 0, html2canvas: { scale: 2.5, useCORS: true, backgroundColor: '#ffffff', letterRendering: true, width: 850 }
