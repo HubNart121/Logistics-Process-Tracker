@@ -43,9 +43,10 @@
         }
         .process-card:last-child .connector-line::before { display: none; }
 
-        /* PDF & Image Export Styles */
+        /* Styles for Screen View Controls */
         .pdf-mirror { display: none; }
 
+        /* CRITICAL: Styles for Report Generation (PDF/Image) */
         .is-generating-pdf .no-print,
         .is-generating-pdf svg,
         .is-generating-pdf button { display: none !important; }
@@ -60,6 +61,7 @@
             display: block !important; 
         }
         
+        /* Fix Thai Font & Layout during Export */
         .is-generating-pdf * {
             letter-spacing: 0 !important;
             line-height: 1.3 !important;
@@ -71,10 +73,10 @@
         }
 
         .is-generating-pdf #main-content { 
-            width: 800px !important; 
+            width: 850px !important; 
             padding: 10mm !important; 
             background: white !important; 
-            margin: 0 auto !important;
+            margin: 0 !important;
         }
         
         .is-generating-pdf .process-card,
@@ -82,88 +84,85 @@
         .is-generating-pdf header { 
             page-break-inside: avoid !important; 
             break-inside: avoid !important;
-            margin-bottom: 1rem !important;
-            border: 1px solid #e2e8f0 !important;
+            margin-bottom: 1.5rem !important;
+            border: 1px solid #f1f5f9 !important;
             background: white !important;
-            border-radius: 1.5rem !important;
         }
 
-        /* Balance Summary in Report */
-        .is-generating-pdf .summary-grid {
-            display: flex !important;
-            flex-direction: row !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            width: 100% !important;
+        /* Fix Summary Card Colors in Report to match Web App */
+        .is-generating-pdf #summaryCard {
+            border: 2px solid #f1f5f9 !important;
+            background-color: #ffffff !important;
+            color: #1e293b !important;
         }
-
-        .is-generating-pdf .summary-col {
-            flex: 0 0 33.33% !important;
-            width: 33.33% !important;
-            text-align: center !important;
-        }
-
-        .is-generating-pdf .total-days-circle {
+        .is-generating-pdf #summaryCard h3 { color: #2563eb !important; }
+        .is-generating-pdf #summaryCard .text-blue-400 { color: #2563eb !important; }
+        
+        /* Summary Total Days Circle in Report */
+        .is-generating-pdf #summaryCard .bg-blue-600 {
             background-color: #2563eb !important;
             color: #ffffff !important;
-            width: 110px !important;
-            height: 110px !important;
-            border-radius: 100% !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: center !important;
-            align-items: center !important;
-            margin: 0 auto !important;
         }
 
-        .is-generating-pdf .cost-box-report {
-            background-color: #f8fafc !important;
-            border: 1px solid #e2e8f0 !important;
-            padding: 8px 16px !important;
-            border-radius: 1rem !important;
-            display: inline-block !important;
+        /* Summary Total Cost Box in Report */
+        .is-generating-pdf #summaryCard .bg-blue-600\/20 {
+            background-color: rgba(37, 99, 235, 0.1) !important;
+            border: 1px solid rgba(37, 99, 235, 0.2) !important;
         }
+        .is-generating-pdf #summaryCard #summaryTotalCost { color: #2563eb !important; }
+        .is-generating-pdf #summaryCard .text-blue-300 { color: #64748b !important; }
 
+        /* Balance the Duration Box in Export */
         .is-generating-pdf .duration-box {
             background-color: #2563eb !important;
             color: white !important;
-            border-radius: 2rem !important;
-            padding: 1.25rem !important;
-            width: 170px !important;
-            min-width: 170px !important;
+            border-radius: 2.5rem !important;
+            padding: 1.5rem !important;
+            min-width: 220px !important;
+            width: 220px !important;
             text-align: center !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
         
-        .is-generating-pdf .duration-box .text-8xl { font-size: 3.5rem !important; font-weight: 900 !important; }
-        .is-generating-pdf .duration-box .text-4xl { font-size: 1.1rem !important; font-weight: bold !important; }
+        .is-generating-pdf .duration-box .text-8xl {
+            font-size: 5rem !important;
+            color: white !important;
+        }
+        .is-generating-pdf .duration-box .text-4xl {
+            font-size: 1.5rem !important;
+            color: white !important;
+        }
 
-        .is-generating-pdf .text-green-600 { color: #16a34a !important; font-weight: bold !important; }
+        .is-generating-pdf .text-green-600 { color: #16a34a !important; }
         .is-generating-pdf .pdf-link-container {
             word-break: break-all !important;
             overflow-wrap: anywhere !important;
+            display: block !important;
             color: #2563eb !important;
-            font-size: 0.7rem !important;
             text-decoration: underline !important;
         }
     </style>
 </head>
 <body class="bg-[#F8FAFC] text-slate-900 min-h-screen flex flex-col md:flex-row overflow-x-hidden">
 
-    <!-- Mobile Header - Fixed to prevent obscuring content -->
-    <header class="md:hidden bg-white/95 backdrop-blur-md fixed top-0 left-0 w-full z-[70] px-6 py-4 border-b border-slate-200 flex justify-between items-center no-print shadow-sm">
+    <!-- Mobile Header -->
+    <header class="md:hidden glass-effect sticky top-0 z-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center no-print">
         <div class="flex items-center gap-2">
             <div class="bg-blue-600 p-2 rounded-lg text-white">
                 <i data-lucide="truck" class="w-5 h-5"></i>
             </div>
-            <span class="font-bold text-xl tracking-tight text-blue-600 uppercase">LT Tracker</span>
+            <span class="font-bold text-xl tracking-tight text-blue-600">LT TRACKER</span>
         </div>
         <button onclick="toggleSidebar()" class="p-2 hover:bg-slate-100 rounded-xl">
-            <i data-lucide="menu" class="w-7 h-7 text-slate-700"></i>
+            <i data-lucide="menu" class="w-7 h-7"></i>
         </button>
     </header>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="no-print fixed inset-y-0 left-0 z-[80] w-72 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col transition-transform duration-300 -translate-x-full md:translate-x-0 md:relative">
+    <aside id="sidebar" class="no-print fixed inset-y-0 left-0 z-[60] w-72 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col transition-transform duration-300 -translate-x-full md:translate-x-0 md:relative">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <div class="bg-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-200 text-white">
@@ -183,15 +182,15 @@
         <div class="p-4 bg-slate-50 border-t border-slate-100">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 text-[10px]">ระบบจัดการโลจิสติกส์</p>
-                <p class="text-[9px] text-slate-300 font-medium tracking-tight uppercase">V 3.2 (Mobile UI Fixed)</p>
+                <p class="text-[9px] text-slate-300 font-medium tracking-tight uppercase">V 3.0 (Precision Export)</p>
             </div>
         </div>
     </aside>
 
-    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/40 z-[75] hidden backdrop-blur-sm md:hidden"></div>
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/40 z-[55] hidden backdrop-blur-sm md:hidden"></div>
 
-    <!-- Main Content - Added top padding for mobile header -->
-    <main class="flex-1 min-w-0 relative h-screen overflow-y-auto custom-scrollbar pt-[72px] md:pt-0">
+    <!-- Main Content -->
+    <main class="flex-1 min-w-0 relative h-screen overflow-y-auto custom-scrollbar">
         <div id="main-content" class="max-w-5xl mx-auto p-4 sm:p-8 pb-24">
             
             <!-- Header Card -->
@@ -217,7 +216,7 @@
 
                         <div class="space-y-2">
                             <input type="text" id="projectName" oninput="updateProject('name', this.value)" 
-                                   class="text-3xl sm:text-4xl font-black text-slate-900 bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
+                                   class="text-4xl font-black text-slate-900 bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
                                    placeholder="ชื่อโปรเจกต์...">
                             <span id="projectName-mirror" class="pdf-mirror text-3xl font-black text-slate-900"></span>
                             
@@ -263,10 +262,10 @@
 
                     <div class="duration-box bg-blue-600 px-10 py-14 rounded-[3rem] text-white flex flex-col items-center justify-center shadow-2xl shadow-blue-200 min-w-[220px]">
                         <p class="text-xl font-extrabold uppercase tracking-[0.1em] opacity-90 mb-3 no-print">ระยะเวลารวม</p>
-                        <p class="pdf-mirror text-base font-bold mb-3 uppercase text-center">ระยะเวลารวม</p>
+                        <p class="pdf-mirror text-base font-bold mb-3 uppercase">ระยะเวลารวม</p>
                         <div class="flex items-baseline gap-2">
-                            <span id="totalDaysHeader" class="text-7xl sm:text-8xl font-black leading-none">0</span>
-                            <span class="text-3xl sm:text-4xl font-bold opacity-90">วัน</span>
+                            <span id="totalDaysHeader" class="text-8xl font-black leading-none">0</span>
+                            <span class="text-4xl font-bold opacity-90">วัน</span>
                         </div>
                     </div>
                 </div>
@@ -292,7 +291,7 @@
                         <i data-lucide="calendar-check" class="text-blue-400 w-8 h-8 no-print"></i>
                         ระยะเวลาโครงการรวม
                     </h3>
-                    <div class="cost-box-report bg-blue-600/20 border border-blue-500/30 px-6 py-3 rounded-2xl flex items-center gap-3">
+                    <div class="bg-blue-600/20 border border-blue-500/30 px-6 py-3 rounded-2xl flex items-center gap-3">
                         <i data-lucide="banknote" class="text-blue-400 w-5 h-5 no-print"></i>
                         <span class="text-xs font-bold uppercase tracking-widest text-blue-300">ค่าใช้จ่ายรวม:</span>
                         <span id="summaryTotalCost" class="text-xl font-black text-white">0.00</span>
@@ -300,28 +299,27 @@
                     </div>
                 </div>
                 
-                <div class="summary-grid grid grid-cols-1 sm:grid-cols-3 gap-10 items-center relative z-10 text-center">
-                    <div class="summary-col space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-10 items-center relative z-10 text-center">
+                    <div class="space-y-3">
                         <p class="text-blue-400 text-xs font-bold uppercase tracking-widest">จุดเริ่มงาน</p>
-                        <p id="summaryStart" class="text-3xl sm:text-4xl font-bold tracking-tight">--/--/----</p>
+                        <p id="summaryStart" class="text-4xl font-bold tracking-tight">--/--/----</p>
                         <p id="summaryOrigin" class="text-slate-400 text-base font-medium truncate px-4">ไม่ระบุต้นทาง</p>
                     </div>
                     
-                    <div class="summary-col flex flex-col items-center justify-center">
-                        <div class="text-xs text-slate-600 uppercase font-bold mb-4 tracking-widest no-print">ระยะเวลาสุทธิ</div>
-                        <div class="flex items-center w-full relative justify-center">
-                            <div class="h-px bg-slate-800 flex-1 no-print"></div>
-                            <div class="total-days-circle bg-blue-600 px-8 py-3.5 rounded-full text-2xl font-black mx-4 shadow-lg shadow-blue-600/20 min-w-[100px]">
-                                <span id="summaryTotalDays" class="text-3xl">0</span>
-                                <span class="text-xs font-bold opacity-80 uppercase block">วัน</span>
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="text-xs text-slate-600 uppercase font-bold mb-4 tracking-widest">ระยะเวลาสุทธิ</div>
+                        <div class="flex items-center w-full relative">
+                            <div class="h-px bg-slate-800 flex-1"></div>
+                            <div class="bg-blue-600 px-8 py-3.5 rounded-full text-2xl font-black mx-4 shadow-lg shadow-blue-600/20">
+                                <span id="summaryTotalDays">0</span> วัน
                             </div>
-                            <div class="h-px bg-slate-800 flex-1 no-print"></div>
+                            <div class="h-px bg-slate-800 flex-1"></div>
                         </div>
                     </div>
 
-                    <div class="summary-col space-y-3">
+                    <div class="space-y-3">
                         <p class="text-blue-400 text-xs font-bold uppercase tracking-widest">จุดสิ้นสุด</p>
-                        <p id="summaryEnd" class="text-3xl sm:text-4xl font-bold tracking-tight">--/--/----</p>
+                        <p id="summaryEnd" class="text-4xl font-bold tracking-tight">--/--/----</p>
                         <p id="summaryDestination" class="text-slate-400 text-base font-medium truncate px-4">ไม่ระบุปลายทาง</p>
                     </div>
                 </div>
@@ -350,11 +348,11 @@
         let projects = JSON.parse(localStorage.getItem('lt_pro_simple_data')) || [
             {
                 id: Date.now(),
-                name: "Import Order #CN-2026",
-                area: "GUANGZHOU-BKK",
-                serviceProvider: "Anan cargo",
+                name: "นำเข้าสินค้าจาก Yiwu มา ไทย",
+                area: "BKK-01",
+                serviceProvider: "Lazada Express",
                 status: "In Progress",
-                globalLink: "https://www.brt.co.th/",
+                globalLink: "",
                 processes: [
                     { id: 101, name: "ส่งสินค้าไปยังโกดัง Yiwu", origin: "Supplier A", destination: "โกดัง Yiwu", start: "2026-03-08", end: "2026-03-16", link: "", cost: 500 },
                     { id: 102, name: "ส่งสินค้าจากจีนมายังโกดังไทย", origin: "โกดัง Yiwu", destination: "โกดังไทย", start: "2026-03-18", end: "2026-03-27", link: "", cost: 2500 }
@@ -371,13 +369,20 @@
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
             const isHidden = sidebar.classList.contains('-translate-x-full');
-            if (isHidden) { sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); }
-            else { sidebar.classList.add('-translate-x-full'); overlay.classList.add('hidden'); }
+            
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
         }
 
         function calculateDays(start, end) {
             if (!start || !end) return 0;
-            const s = new Date(start); const e = new Date(end);
+            const s = new Date(start);
+            const e = new Date(end);
             const diff = Math.ceil((e - s) / (1000 * 60 * 60 * 24));
             return diff >= 0 ? diff : 0;
         }
@@ -391,13 +396,29 @@
 
         function addProject() {
             const newId = Date.now();
-            projects.push({ id: newId, name: "โปรเจกต์ใหม่", area: "", serviceProvider: "", status: "Kick off", globalLink: "", processes: [] });
-            activeProjectId = newId; save(); render(); if (window.innerWidth < 768) toggleSidebar();
+            projects.push({
+                id: newId,
+                name: "โปรเจกต์ใหม่",
+                area: "",
+                serviceProvider: "",
+                status: "Kick off",
+                globalLink: "",
+                processes: []
+            });
+            activeProjectId = newId;
+            save();
+            render();
+            if (window.innerWidth < 768) toggleSidebar();
         }
 
         function updateProject(field, value) {
             const project = projects.find(p => p.id === activeProjectId);
-            if (project) { project[field] = value; save(); if (field === 'name') renderSidebar(); updateSummaryData(); }
+            if (project) {
+                project[field] = value;
+                save();
+                if (field === 'name') renderSidebar();
+                updateSummaryData();
+            }
         }
 
         async function showConfirm(title, message) {
@@ -406,8 +427,10 @@
                 document.getElementById('dialogTitle').innerText = title;
                 document.getElementById('dialogMessage').innerText = message;
                 modal.classList.replace('hidden', 'flex');
+                
                 const onCancel = () => { modal.classList.replace('flex', 'hidden'); resolve(false); };
                 const onConfirm = () => { modal.classList.replace('flex', 'hidden'); resolve(true); };
+                
                 document.getElementById('dialogCancel').onclick = onCancel;
                 document.getElementById('dialogConfirm').onclick = onConfirm;
             });
@@ -417,14 +440,29 @@
             event.stopPropagation();
             if (projects.length === 1) return;
             const ok = await showConfirm("ลบโปรเจกต์?", "ข้อมูลทั้งหมดในโปรเจกต์นี้จะถูกลบถาวร");
-            if (ok) { projects = projects.filter(p => p.id !== id); if (activeProjectId === id) activeProjectId = projects[0].id; save(); render(); }
+            if (ok) {
+                projects = projects.filter(p => p.id !== id);
+                if (activeProjectId === id) activeProjectId = projects[0].id;
+                save();
+                render();
+            }
         }
 
         function addProcess() {
             const project = projects.find(p => p.id === activeProjectId);
             const last = project.processes[project.processes.length - 1];
-            project.processes.push({ id: Date.now(), name: "", origin: last ? last.destination : "", destination: "", start: last ? last.end : "", end: "", link: "", cost: 0 });
-            save(); render();
+            project.processes.push({
+                id: Date.now(),
+                name: "",
+                origin: last ? last.destination : "",
+                destination: "",
+                start: last ? last.end : "",
+                end: "",
+                link: "",
+                cost: 0
+            });
+            save();
+            render();
         }
 
         function updateProcess(id, field, value) {
@@ -432,8 +470,14 @@
             const proc = project.processes.find(p => p.id === id);
             if (proc) {
                 if (field === 'cost') value = parseFloat(value) || 0;
-                proc[field] = value; save();
-                if (field === 'start' || field === 'end') { render(); } else { updateSummaryData(); }
+                proc[field] = value;
+                save();
+                
+                if (field === 'start' || field === 'end') {
+                    render();
+                } else {
+                    updateSummaryData();
+                }
             }
         }
 
@@ -442,7 +486,8 @@
             if (ok) {
                 const project = projects.find(p => p.id === activeProjectId);
                 project.processes = project.processes.filter(p => p.id !== id);
-                save(); render();
+                save();
+                render();
             }
         }
 
@@ -454,7 +499,15 @@
                 const div = document.createElement('div');
                 div.className = `group flex items-center justify-between p-5 rounded-[1.25rem] cursor-pointer transition-all mb-3 ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' : 'hover:bg-slate-50 text-slate-500'}`;
                 div.onclick = () => { activeProjectId = p.id; render(); if (window.innerWidth < 768) toggleSidebar(); };
-                div.innerHTML = `<div class="flex items-center gap-4 overflow-hidden"><i data-lucide="file-text" class="w-5 h-5 shrink-0 opacity-70"></i><span class="text-base font-bold truncate">${p.name || 'Untitled'}</span></div><button onclick="deleteProject(${p.id}, event)" class="opacity-0 group-hover:opacity-100 p-2 hover:bg-white/20 rounded-lg transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                div.innerHTML = `
+                    <div class="flex items-center gap-4 overflow-hidden">
+                        <i data-lucide="file-text" class="w-5 h-5 shrink-0 opacity-70"></i>
+                        <span class="text-base font-bold truncate">${p.name || 'Untitled'}</span>
+                    </div>
+                    <button onclick="deleteProject(${p.id}, event)" class="opacity-0 group-hover:opacity-100 p-2 hover:bg-white/20 rounded-lg transition-all">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                `;
                 list.appendChild(div);
             });
             lucide.createIcons();
@@ -463,13 +516,16 @@
         function render() {
             renderSidebar();
             const project = projects.find(p => p.id === activeProjectId);
+            
             document.getElementById('projectName').value = project.name;
             document.getElementById('projectArea').value = project.area;
             document.getElementById('serviceProvider').value = project.serviceProvider;
             document.getElementById('projectStatus').value = project.status;
             document.getElementById('projectGlobalLink').value = project.globalLink || "";
+
             const container = document.getElementById('processContainer');
             container.innerHTML = '';
+
             project.processes.forEach((p, index) => {
                 const days = calculateDays(p.start, p.end);
                 const card = document.createElement('div');
@@ -483,11 +539,16 @@
                                     <div class="flex-1">
                                         <p class="text-xs font-black text-blue-600 uppercase tracking-widest mb-2 no-print">Step 0${index + 1}</p>
                                         <p class="pdf-mirror text-xs font-black text-blue-600 mb-1 uppercase">ขั้นตอนที่ 0${index + 1}</p>
-                                        <input type="text" value="${p.name}" oninput="updateProcess(${p.id}, 'name', this.value)" class="text-xl sm:text-2xl font-bold bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" placeholder="ชื่อขั้นตอนการทำงาน...">
+                                        <input type="text" value="${p.name}" oninput="updateProcess(${p.id}, 'name', this.value)" 
+                                               class="text-2xl font-bold bg-transparent border-none focus:outline-none w-full p-0 placeholder:text-slate-200" 
+                                               placeholder="ชื่อขั้นตอนการทำงาน...">
                                         <span class="pdf-mirror text-2xl font-bold text-slate-900">${p.name || '-'}</span>
                                     </div>
-                                    <button onclick="removeProcess(${p.id})" class="no-print p-2.5 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"><i data-lucide="trash-2" class="w-6 h-6"></i></button>
+                                    <button onclick="removeProcess(${p.id})" class="no-print p-2.5 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all">
+                                        <i data-lucide="trash-2" class="w-6 h-6"></i>
+                                    </button>
                                 </div>
+
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div class="bg-slate-50 p-5 rounded-2xl flex items-center gap-5 border border-slate-100/50">
                                         <div class="bg-white p-3 rounded-xl text-slate-400 shadow-sm no-print"><i data-lucide="arrow-up-right" class="w-5 h-5"></i></div>
@@ -508,26 +569,33 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div class="flex flex-col gap-2">
                                         <label class="text-[10px] font-bold text-green-600 uppercase tracking-widest ml-2 no-print">Link :</label>
                                         <p class="pdf-mirror text-[10px] font-bold text-green-600 ml-2 uppercase">Link :</p>
                                         <div class="flex items-center gap-2">
-                                            <input type="url" id="link-${p.id}" value="${p.link || ''}" oninput="updateProcess(${p.id}, 'link', this.value)" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl font-medium text-slate-600 text-sm outline-none focus:ring-2 ring-blue-50" placeholder="https://...">
+                                            <input type="url" id="link-${p.id}" value="${p.link || ''}" oninput="updateProcess(${p.id}, 'link', this.value)" 
+                                                class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl font-medium text-slate-600 text-sm outline-none focus:ring-2 ring-blue-50"
+                                                placeholder="https://...">
                                             ${p.link ? `<a href="${p.link}" target="_blank" class="no-print p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100"><i data-lucide="external-link" class="w-4 h-4"></i></a>` : ''}
                                         </div>
-                                        <div class="pdf-mirror ml-2 text-[11px] pdf-link-container text-blue-600 underline font-medium">${p.link || '-'}</div>
+                                        <div class="pdf-mirror ml-2 text-[11px] pdf-link-container text-blue-600 underline font-medium">
+                                            ${p.link || '-'}
+                                        </div>
                                     </div>
                                     <div class="flex flex-col gap-2">
                                         <label class="text-[10px] font-bold text-green-600 uppercase tracking-widest ml-2 no-print">ค่าใช้จ่าย :</label>
                                         <p class="pdf-mirror text-[10px] font-bold text-green-600 ml-2 uppercase">ค่าใช้จ่าย :</p>
                                         <div class="relative">
-                                            <input type="number" value="${p.cost || 0}" oninput="updateProcess(${p.id}, 'cost', this.value)" class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl font-bold text-slate-700 text-sm outline-none focus:ring-2 ring-blue-50 pr-12 text-right">
+                                            <input type="number" value="${p.cost || 0}" oninput="updateProcess(${p.id}, 'cost', this.value)" 
+                                                class="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl font-bold text-slate-700 text-sm outline-none focus:ring-2 ring-blue-50 pr-12 text-right">
                                             <span class="absolute right-4 top-3 text-xs font-bold text-slate-400 no-print">บาท</span>
                                         </div>
                                         <span class="pdf-mirror ml-2 text-base font-bold text-slate-800">${(p.cost || 0).toLocaleString()} บาท</span>
                                     </div>
                                 </div>
+
                                 <div class="grid grid-cols-2 gap-6 pt-2">
                                     <div class="flex flex-col">
                                         <p class="pdf-mirror text-[10px] font-bold text-slate-400 mb-1 ml-2 uppercase">วันที่เริ่ม</p>
@@ -543,28 +611,43 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="duration-box md:w-64 flex flex-col items-center justify-center bg-blue-600 rounded-[3.5rem] p-12 text-white shadow-xl shadow-blue-100 transition-all">
                                 <p class="text-xl font-extrabold uppercase mb-2 opacity-90 no-print text-center">ระยะเวลา</p>
                                 <p class="pdf-mirror text-base font-bold mb-1 text-center uppercase">ระยะเวลา</p>
-                                <div class="text-7xl sm:text-8xl font-black mb-1 leading-none text-center">${days}</div>
-                                <p class="text-3xl sm:text-4xl font-bold uppercase opacity-90 text-center">วัน</p>
+                                <div class="text-8xl font-black mb-1 leading-none text-center">${days}</div>
+                                <p class="text-4xl font-bold uppercase opacity-90 text-center">วัน</p>
                             </div>
                         </div>
-                    </div>`;
+                    </div>
+                `;
                 container.appendChild(card);
             });
-            updateSummaryData(); lucide.createIcons();
+
+            updateSummaryData();
+            lucide.createIcons();
         }
 
         function updateSummaryData() {
             const project = projects.find(p => p.id === activeProjectId);
-            let firstStart = null; let lastEnd = null; let totalCost = 0;
+            let firstStart = null;
+            let lastEnd = null;
+            let totalCost = 0;
+
             project.processes.forEach((p) => {
                 totalCost += (p.cost || 0);
-                if (p.start) { const sd = new Date(p.start); if (!firstStart || sd < firstStart) firstStart = sd; }
-                if (p.end) { const ed = new Date(p.end); if (!lastEnd || ed > lastEnd) lastEnd = ed; }
+                if (p.start) {
+                    const sd = new Date(p.start);
+                    if (!firstStart || sd < firstStart) firstStart = sd;
+                }
+                if (p.end) {
+                    const ed = new Date(p.end);
+                    if (!lastEnd || ed > lastEnd) lastEnd = ed;
+                }
             });
+
             const netDuration = (firstStart && lastEnd) ? calculateDays(firstStart, lastEnd) : 0;
+            
             document.getElementById('totalDaysHeader').innerText = netDuration;
             document.getElementById('summaryTotalDays').innerText = netDuration;
             document.getElementById('summaryStart').innerText = formatDateThai(firstStart);
@@ -572,6 +655,7 @@
             document.getElementById('summaryOrigin').innerText = project.processes.length > 0 ? (project.processes[0].origin || "ไม่ระบุ") : "ไม่ระบุ";
             document.getElementById('summaryDestination').innerText = project.processes.length > 0 ? (project.processes[project.processes.length - 1].destination || "ไม่ระบุ") : "ไม่ระบุ";
             document.getElementById('summaryTotalCost').innerText = totalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
             document.getElementById('projectName-mirror').innerText = project.name;
             document.getElementById('projectArea-mirror').innerText = project.area;
             document.getElementById('serviceProvider-mirror').innerText = project.serviceProvider;
@@ -582,31 +666,66 @@
             const project = projects.find(p => p.id === activeProjectId);
             document.body.classList.add('is-generating-pdf');
             window.scrollTo(0, 0);
+
             const opt = {
-                margin: 0, filename: `Logistics_Report_${project.name}.pdf`, image: { type: 'jpeg', quality: 1.0 },
-                html2canvas: { scale: 2, useCORS: true, letterRendering: true, backgroundColor: '#ffffff', width: 850 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['css', 'legacy'] }
+                margin: 0, 
+                filename: `Logistics_Report_${project.name}.pdf`,
+                image: { type: 'jpeg', quality: 1.0 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true,
+                    backgroundColor: '#ffffff',
+                    width: 850
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['css', 'legacy'] }
             };
-            try { await new Promise(r => setTimeout(r, 1200)); const element = document.getElementById('main-content'); await html2pdf().set(opt).from(element).save(); }
-            finally { document.body.classList.remove('is-generating-pdf'); }
+
+            try {
+                await new Promise(r => setTimeout(r, 800));
+                const element = document.getElementById('main-content');
+                await html2pdf().set(opt).from(element).save();
+            } finally {
+                document.body.classList.remove('is-generating-pdf');
+            }
         }
 
         async function downloadImage() {
             const project = projects.find(p => p.id === activeProjectId);
             document.body.classList.add('is-generating-pdf');
             window.scrollTo(0, 0);
+
             try {
-                await new Promise(r => setTimeout(r, 1500));
+                await new Promise(r => setTimeout(r, 1000));
                 const element = document.getElementById('main-content');
+
                 const worker = html2pdf().from(element).set({
-                    margin: 0, html2canvas: { scale: 2.5, useCORS: true, backgroundColor: '#ffffff', letterRendering: true, width: 850 }
+                    margin: 0,
+                    html2canvas: { 
+                        scale: 2.5,
+                        useCORS: true, 
+                        backgroundColor: '#ffffff',
+                        letterRendering: true,
+                        width: 850
+                    }
                 });
+
                 const canvas = await worker.toCanvas().get('canvas');
                 const dataUrl = canvas.toDataURL('image/jpeg', 0.98);
-                const link = document.createElement('a'); link.href = dataUrl; link.download = `Logistics_Report_${project.name}.jpg`;
-                document.body.appendChild(link); link.click(); document.body.removeChild(link);
-            } catch (err) { alert("เกิดข้อผิดพลาดในการสร้างรูปภาพ กรุณาลองใหม่อีกครั้ง"); }
-            finally { document.body.classList.remove('is-generating-pdf'); }
+                
+                const link = document.createElement('a');
+                link.href = dataUrl;
+                link.download = `Logistics_Report_${project.name}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (err) {
+                console.error(err);
+                alert("เกิดข้อผิดพลาดในการสร้างรูปภาพ กรุณาลองใหม่อีกครั้ง");
+            } finally {
+                document.body.classList.remove('is-generating-pdf');
+            }
         }
 
         function shareProject() {
@@ -614,8 +733,18 @@
             const total = document.getElementById('summaryTotalDays').innerText;
             const totalCost = document.getElementById('summaryTotalCost').innerText;
             const text = `โครงการ: ${project.name}\nพื้นที่: ${project.area}\nสถานะ: ${project.status}\nระยะเวลา: ${total} วัน\nค่าใช้จ่ายรวม: ${totalCost} บาท\nสร้างโดย Logistic Tracker Pro`;
-            if (navigator.share) { navigator.share({ title: project.name, text: text }).catch(() => {}); }
-            else { const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert("คัดลอกสรุปสถานะลงในคลิปบอร์ดแล้ว"); }
+            
+            if (navigator.share) {
+                navigator.share({ title: project.name, text: text }).catch(() => {});
+            } else {
+                const el = document.createElement('textarea');
+                el.value = text;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                alert("คัดลอกสรุปสถานะลงในคลิปบอร์ดแล้ว");
+            }
         }
 
         window.onload = render;
